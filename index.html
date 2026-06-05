@@ -167,43 +167,10 @@
       z-index: 1;
     }
 
-    /* 상태바 */
-    .status-bar {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      height: 54px;
-      background: #000;
-      display: flex;
-      align-items: stretch;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .status-time {
-      width: 138px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 17px;
-      font-weight: 590;
-      color: #fff;
-      letter-spacing: 0;
-    }
-
-    .status-icons {
-      display: flex;
-      align-items: center;
-      padding-right: 12px;
-      gap: 6px;
-    }
-
-    .status-icons svg { color: #fff; }
-
     /* 비디오 오버레이 컨트롤 */
     .video-controls {
       position: absolute;
-      inset: 54px 0 0 0;
+      inset: 0;
       z-index: 3;
       display: flex;
       flex-direction: column;
@@ -499,32 +466,6 @@
          src="assets/content_live_view.jpg"
          alt="라이브 화면" />
     <div class="video-dim"></div>
-
-    <!-- 상태바 -->
-    <div class="status-bar">
-      <div class="status-time">9:41</div>
-      <div class="status-icons">
-        <!-- 신호 -->
-        <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
-          <rect x="0" y="6" width="3" height="6" rx="1" fill="white"/>
-          <rect x="4.5" y="4" width="3" height="8" rx="1" fill="white"/>
-          <rect x="9" y="2" width="3" height="10" rx="1" fill="white"/>
-          <rect x="13.5" y="0" width="3" height="12" rx="1" fill="white"/>
-        </svg>
-        <!-- 와이파이 -->
-        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
-          <path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="white"/>
-          <path d="M3.5 6.5C4.9 5.1 6.35 4.5 8 4.5s3.1.6 4.5 2" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          <path d="M0.5 3.5C2.6 1.3 5.15 0 8 0s5.4 1.3 7.5 3.5" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-        </svg>
-        <!-- 배터리 -->
-        <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
-          <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/>
-          <rect x="2" y="2" width="18" height="8" rx="2" fill="white"/>
-          <path d="M23 4v4a2 2 0 0 0 0-4z" fill="white" fill-opacity="0.4"/>
-        </svg>
-      </div>
-    </div>
 
     <!-- 오버레이 컨트롤 -->
     <div class="video-controls">
