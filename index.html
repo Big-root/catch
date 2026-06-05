@@ -35,25 +35,105 @@
 
     body {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #111;
+      background: #0a0a0a;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       min-height: 100vh;
-      padding: 20px 0;
+      padding: 40px 20px;
+    }
+
+    /* ── 아이폰 목업 프레임 (데스크탑) ── */
+    .phone-frame {
+      position: relative;
+      width: 433px;
+      height: 936px;
+      flex-shrink: 0;
+    }
+
+    /* 폰 외형 */
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 54px;
+      background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 40%, #222 100%);
+      box-shadow:
+        0 0 0 1px #3a3a3a,
+        0 0 0 2px #1a1a1a,
+        0 30px 80px rgba(0,0,0,0.9),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      z-index: 0;
+    }
+
+    /* 화면 영역 */
+    .phone-screen {
+      position: absolute;
+      inset: 12px;
+      border-radius: 44px;
+      overflow: hidden;
+      z-index: 1;
+      background: #000;
+    }
+
+    /* 다이나믹 아일랜드 */
+    .dynamic-island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 34px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 10;
+    }
+
+    /* 사이드 버튼들 */
+    .btn-side-left {
+      position: absolute;
+      left: -3px;
+      top: 140px;
+      width: 4px;
+      height: 34px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: -1px 0 2px rgba(0,0,0,0.5);
+    }
+    .btn-side-left::before,
+    .btn-side-left::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 64px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: -1px 0 2px rgba(0,0,0,0.5);
+    }
+    .btn-side-left::before { top: 50px; }
+    .btn-side-left::after  { top: 126px; }
+
+    .btn-side-right {
+      position: absolute;
+      right: -3px;
+      top: 200px;
+      width: 4px;
+      height: 80px;
+      background: #2a2a2a;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 1px 0 2px rgba(0,0,0,0.5);
     }
 
     /* ── 전체 앱 컨테이너 ── */
     .app {
-      width: 393px;
-      min-height: 844px;
+      width: 100%;
+      height: 100%;
       background: var(--bg-secondary);
       position: relative;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      border-radius: 44px;
-      box-shadow: 0 0 80px rgba(0,0,0,0.8);
     }
 
     /* ── 1. 비디오 영역 ── */
@@ -382,14 +462,31 @@
     }
     .chat-inner > * { animation: fadeInUp 0.25s ease both; }
 
-    /* 반응형: 화면이 앱보다 작을 때 */
-    @media (max-width: 433px) {
-      body { padding: 0; align-items: flex-start; }
-      .app { width: 100%; border-radius: 0; min-height: 100vh; box-shadow: none; }
+    /* ── 반응형: 실제 모바일 기기 ── */
+    @media (max-width: 500px) {
+      body { padding: 0; background: var(--bg-secondary); }
+      .phone-frame {
+        width: 100vw;
+        height: 100vh;
+        background: none;
+      }
+      .phone-frame::before { display: none; }
+      .phone-screen {
+        inset: 0;
+        border-radius: 0;
+      }
+      .dynamic-island,
+      .btn-side-left,
+      .btn-side-right { display: none; }
     }
   </style>
 </head>
 <body>
+<div class="phone-frame">
+  <div class="dynamic-island"></div>
+  <div class="btn-side-left"></div>
+  <div class="btn-side-right"></div>
+  <div class="phone-screen">
 <div class="app">
 
   <!-- ① 비디오 영역 -->
@@ -698,7 +795,9 @@
   <!-- ④ Safe Area -->
   <div class="safe-area"></div>
 
-</div>
+</div><!-- /.app -->
+  </div><!-- /.phone-screen -->
+</div><!-- /.phone-frame -->
 
 <script>
   // 채팅 자동 스크롤 to bottom
