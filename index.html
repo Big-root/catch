@@ -162,6 +162,13 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      pointer-events: auto;
+    }
+    .video-controls.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .ctrl-row {
@@ -850,6 +857,24 @@
 
   // 2초마다 새 채팅 추가
   setInterval(addChat, 2000);
+
+  // 비디오 컨트롤 자동 숨김
+  const videoControls = document.querySelector('.video-controls');
+  const videoArea = document.querySelector('.video-area');
+  let hideTimer = null;
+
+  function showControls() {
+    videoControls.classList.remove('hidden');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      videoControls.classList.add('hidden');
+    }, 3000);
+  }
+
+  showControls();
+
+  videoArea.addEventListener('click', showControls);
+  videoArea.addEventListener('touchstart', showControls, { passive: true });
 
   // 목업 온오프 토글
   const mockupToggle = document.getElementById('mockupToggle');
