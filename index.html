@@ -433,6 +433,64 @@
     }
     .chat-inner > * { animation: fadeInUp 0.25s ease both; }
 
+    /* ── 목업 토글 버튼 ── */
+    .mockup-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.55);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      user-select: none;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .mockup-toggle:hover {
+      background: rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.85);
+    }
+    .mockup-toggle.is-on {
+      background: rgba(1, 130, 255, 0.15);
+      border-color: rgba(1, 130, 255, 0.4);
+      color: #4da8ff;
+    }
+
+    /* ── 목업 프레임 전환 애니메이션 ── */
+    .phone-frame {
+      transition: width 0.3s ease, height 0.3s ease;
+    }
+    .phone-screen {
+      transition: inset 0.3s ease, border-radius 0.3s ease;
+    }
+
+    /* ── 목업 OFF 상태 ── */
+    .phone-frame.no-frame {
+      width: 375px;
+      height: 812px;
+    }
+    .phone-frame.no-frame::before { display: none; }
+    .phone-frame.no-frame .dynamic-island,
+    .phone-frame.no-frame .btn-side-left,
+    .phone-frame.no-frame .btn-side-right { display: none; }
+    .phone-frame.no-frame .phone-screen {
+      inset: 0;
+      border-radius: 12px;
+    }
+
     /* ── 반응형: 실제 모바일 기기 ── */
     @media (max-width: 500px) {
       body { padding: 0; background: var(--bg-secondary); }
@@ -449,6 +507,7 @@
       .dynamic-island,
       .btn-side-left,
       .btn-side-right { display: none; }
+      .mockup-toggle { display: none; }
     }
   </style>
 </head>
@@ -744,6 +803,14 @@
   </div><!-- /.phone-screen -->
 </div><!-- /.phone-frame -->
 
+<button class="mockup-toggle is-on" id="mockupToggle">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="12" cy="18" r="1.5" fill="currentColor"/>
+  </svg>
+  <span>목업 ON</span>
+</button>
+
 <script>
   // 채팅 자동 스크롤 to bottom
   const scroll = document.getElementById('chatScroll');
@@ -795,6 +862,18 @@
 
   // 2초마다 새 채팅 추가
   setInterval(addChat, 2000);
+
+  // 목업 온오프 토글
+  const mockupToggle = document.getElementById('mockupToggle');
+  const phoneFrame = document.querySelector('.phone-frame');
+  let isMockupOn = true;
+
+  mockupToggle.addEventListener('click', () => {
+    isMockupOn = !isMockupOn;
+    phoneFrame.classList.toggle('no-frame', !isMockupOn);
+    mockupToggle.classList.toggle('is-on', isMockupOn);
+    mockupToggle.querySelector('span').textContent = isMockupOn ? '목업 ON' : '목업 OFF';
+  });
 </script>
 </body>
 </html>
