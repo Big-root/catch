@@ -419,6 +419,131 @@
     /* ── 5. Safe area ── */
     .safe-area { height: 34px; background: var(--bg-primary); flex-shrink: 0; }
 
+    /* ── 방송 정보 ── */
+    .live-info {
+      background: var(--bg-primary);
+      flex-shrink: 0;
+      overflow: hidden;
+      max-height: 140px;
+      opacity: 1;
+      transition: max-height 0.35s ease, opacity 0.3s ease;
+    }
+    .live-info.hidden {
+      max-height: 0;
+      opacity: 0;
+    }
+    .live-info-inner {
+      padding: 14px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .live-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--label-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: normal;
+    }
+    .live-tags {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .live-tag {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--label-quaternary);
+      background: rgba(145,150,161,0.1);
+      white-space: nowrap;
+    }
+    .live-tag.primary { background: rgba(145,150,161,0.2); }
+    .live-bj-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .live-bj-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .live-bj-profile {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .live-bj-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .live-bj-nick {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--label-tertiary);
+      white-space: nowrap;
+    }
+    .live-viewers {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      height: 20px;
+      padding: 0 8px;
+      border: 1px solid rgba(117,123,138,0.2);
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .live-viewer-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff2f00;
+      flex-shrink: 0;
+    }
+    .live-viewer-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--label-tertiary);
+    }
+    .live-bj-right {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+      margin-left: 6px;
+    }
+    .live-action-btn {
+      width: 48px;
+      height: 34px;
+      border-radius: 17px;
+      background: rgba(145,150,161,0.1);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .live-info-divider {
+      height: 1px;
+      background: rgba(145,150,161,0.1);
+      margin: 0 16px;
+    }
+
     /* ── 애니메이션: 채팅 스크롤 ── */
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(6px); }
@@ -594,7 +719,50 @@
     </div>
   </div>
 
-  <!-- ② 채팅 영역 -->
+  <!-- ② 방송 정보 -->
+  <div class="live-info" id="liveInfo">
+    <div class="live-info-inner">
+      <p class="live-title">네모도 꿈이있는데! 여우는빚쟁이가됌;; 랜드마꾸! 일이삼사오육칠팔</p>
+      <div class="live-tags">
+        <span class="live-tag primary">보이는라디오</span>
+        <span class="live-tag">먹방</span>
+        <span class="live-tag">벚꽃엔딩</span>
+      </div>
+      <div class="live-bj-row">
+        <div class="live-bj-left">
+          <img class="live-bj-profile" src="assets/profile_bj.jpg" alt="프로필"/>
+          <div class="live-bj-meta">
+            <span class="live-bj-nick">항상#킴성태</span>
+            <div class="live-viewers">
+              <span class="live-viewer-dot"></span>
+              <span class="live-viewer-count">4,235</span>
+            </div>
+          </div>
+        </div>
+        <div class="live-bj-right">
+          <!-- 구독 버튼 -->
+          <button class="live-action-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <g transform="translate(2.41,2.08) scale(0.9995)">
+                <path d="M11.1369 0C12.8905 0 14.3336 1.33682 14.5041 3.0459C15.5623 3.20759 16.3358 3.72466 16.8439 4.44336C17.4295 5.27172 17.6017 6.27785 17.6017 7.08105C17.6017 7.90157 17.4609 8.91754 16.8781 9.74805C16.3157 10.5494 15.4224 11.0636 14.175 11.1533C13.2823 13.8452 10.753 15.833 7.70526 15.833H6.82538C3.11904 15.833 0.0116505 12.831 0.0089757 9.02148L0.00799914 8.94629L0.00604601 8.72852C0.00456742 8.54406 0.00234571 8.28637 0.0011632 7.99316C-0.00119702 7.4079 -0.000598606 6.67454 0.0089757 6.09863C0.0179786 5.55738 0.0399418 4.86895 0.0597569 4.31934C0.0696942 4.04371 0.0792276 3.80119 0.0861241 3.62793L0.0968663 3.36621C0.107048 1.50678 1.61983 9.3885e-06 3.48163 0H11.1369ZM3.48163 1.66699C2.53412 1.667 1.76306 2.43729 1.76288 3.38477C1.76288 3.39637 1.76337 3.40832 1.76288 3.41992L1.75116 3.69434C1.74433 3.86592 1.73561 4.106 1.72577 4.37891C1.70603 4.92663 1.68371 5.60261 1.67499 6.12695C1.66572 6.68474 1.6658 7.40332 1.66816 7.98633C1.66933 8.27709 1.67157 8.53302 1.67304 8.71582L1.67401 8.93066L1.67499 9.00781V9.0166C1.67501 11.8921 4.02194 14.167 6.82538 14.167H7.70526C10.5807 14.167 12.8556 11.82 12.8557 9.0166V3.38477C12.8555 2.43729 12.0844 1.66699 11.1369 1.66699H3.48163ZM7.3537 4.05957C7.54069 4.05975 7.67848 4.18363 7.75116 4.32715L8.60663 5.95215C8.61109 5.95254 8.61588 5.9525 8.6203 5.95312L10.4543 6.21582C10.6681 6.22597 10.8064 6.38742 10.8498 6.53906C10.8943 6.69476 10.8561 6.90111 10.674 7.0166L9.29023 8.40137L9.28144 8.41016L9.62226 10.2021C9.62516 10.2175 9.62714 10.2334 9.62714 10.249C9.62699 10.4338 9.52898 10.572 9.40546 10.6543C9.28941 10.7316 9.15051 10.7626 9.02558 10.7627C8.98501 10.7627 8.94429 10.7523 8.90839 10.7334L7.2912 9.88281H7.23944L5.61737 10.7363C5.42369 10.8332 5.23026 10.7772 5.1037 10.6719C4.98417 10.5723 4.90365 10.4153 4.90351 10.249C4.90351 10.2334 4.90548 10.2175 4.90839 10.2021L5.24921 8.41016L3.92109 7.08203C3.90209 7.06303 3.88623 7.04063 3.87421 7.0166C3.80076 6.8697 3.78991 6.69789 3.86347 6.55078C3.93711 6.4039 4.08223 6.31071 4.25312 6.30371L6.00409 6.05273L6.09394 5.96289L6.95526 4.32715C7.028 4.18353 7.16651 4.05957 7.3537 4.05957ZM14.5217 9.0166C14.5217 9.15422 14.5162 9.29092 14.508 9.42676C15.0319 9.30601 15.3277 9.05611 15.5139 8.79102C15.8108 8.36785 15.9347 7.75617 15.9348 7.08105C15.9348 6.47643 15.7989 5.85376 15.4826 5.40625C15.2863 5.12854 14.9938 4.87654 14.5217 4.74805V9.0166Z" fill="#d5d7dc"/>
+              </g>
+            </svg>
+          </button>
+          <!-- 즐겨찾기 버튼 -->
+          <button class="live-action-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <g transform="translate(1.98,2.09)">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.37938 1.02078C7.05227 -0.34017 8.9931 -0.340285 9.66615 1.02058L11.0989 3.91756C11.132 3.98441 11.1922 4.02534 11.2555 4.03453L11.2584 4.03495L14.4804 4.51386C15.9815 4.73699 16.577 6.58317 15.4892 7.64139L13.174 9.89363C13.1222 9.94398 13.0958 10.0207 13.1091 10.0985L13.6568 13.2866C13.9126 14.7759 12.3573 15.9188 11.0122 15.2165C10.3139 14.8519 9.3703 14.3583 8.11454 13.6996C8.05657 13.6692 7.98883 13.6692 7.93087 13.6996L5.0494 15.2097C3.70434 15.9145 2.13456 14.7722 2.39153 13.2755L2.93701 10.0985C2.95036 10.0208 2.92395 9.94398 2.87219 9.89363L0.556949 7.64139C-0.530876 6.58318 0.0646266 4.73699 1.56576 4.51386L4.79055 4.03454C4.85389 4.02535 4.9141 3.98441 4.94715 3.91755L6.37938 1.02078ZM8.17221 1.75945C8.11102 1.63573 7.93458 1.63574 7.87341 1.75946L6.44118 4.65623C6.16847 5.20782 5.64357 5.59435 5.03148 5.6837C5.03093 5.68378 5.03039 5.68386 5.02984 5.68394L1.8108 6.16242C1.67434 6.1827 1.6202 6.35054 1.71909 6.44674L4.03433 8.69897C4.48294 9.13536 4.68523 9.76577 4.57964 10.3806C4.57963 10.3806 4.57964 10.3805 4.57964 10.3806L4.03416 13.5576C4.0108 13.6936 4.15351 13.7975 4.27578 13.7334L7.15664 12.2237C7.6994 11.939 8.3459 11.939 8.88867 12.2237C10.1437 12.8819 11.0864 13.3751 11.7835 13.7391C11.9003 13.8001 12.0376 13.7048 12.0142 13.5688L11.4665 10.3806C11.3609 9.76582 11.5632 9.13538 12.0118 8.69897L14.3271 6.44674C14.4259 6.35054 14.3718 6.1827 14.2353 6.16242L11.0162 5.68393C11.0157 5.68384 11.0151 5.68376 11.0145 5.68368C10.4025 5.59432 9.87772 5.20789 9.60498 4.65643L8.17221 1.75945Z" fill="#d5d7dc"/>
+              </g>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="live-info-divider"></div>
+  </div>
+
+  <!-- ③ 채팅 영역 -->
   <div class="chat-area">
     <!-- 드래그 핸들 -->
     <div class="drag-handle"><div class="drag-handle-bar"></div></div>
@@ -858,16 +1026,19 @@
   // 2초마다 새 채팅 추가
   setInterval(addChat, 2000);
 
-  // 비디오 컨트롤 자동 숨김
+  // 비디오 컨트롤 + 방송 정보 자동 숨김
   const videoControls = document.querySelector('.video-controls');
+  const liveInfo = document.getElementById('liveInfo');
   const videoArea = document.querySelector('.video-area');
   let hideTimer = null;
 
   function showControls() {
     videoControls.classList.remove('hidden');
+    liveInfo.classList.remove('hidden');
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
       videoControls.classList.add('hidden');
+      liveInfo.classList.add('hidden');
     }, 3000);
   }
 
@@ -875,6 +1046,8 @@
 
   videoArea.addEventListener('click', showControls);
   videoArea.addEventListener('touchstart', showControls, { passive: true });
+  liveInfo.addEventListener('click', showControls);
+  liveInfo.addEventListener('touchstart', showControls, { passive: true });
 
   // 목업 온오프 토글
   const mockupToggle = document.getElementById('mockupToggle');
