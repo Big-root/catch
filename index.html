@@ -1384,7 +1384,7 @@
       card.style.cssText = [
         'position:absolute', `top:${dims.top}px`, 'left:0', 'right:0', `height:${dims.h}px`,
         'overflow:hidden', 'background:#0a0a0a', 'z-index:2',
-        `transform:translateY(${offset}px)`, 'transition:none'
+        `transform:translateY(${offset}px) scale(0.88)`, 'opacity:0', 'transition:none'
       ].join(';');
       card.innerHTML = `<video style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.95" autoplay muted loop playsinline><source src="${b.src}" type="video/mp4"/></video><div style="position:absolute;inset:0;background:${b.dim}"></div>`;
       appEl.appendChild(card);
@@ -1393,8 +1393,11 @@
       videoAreaEl.style.transition = 'none';
     }
     if (!liveDrag.inCard) return;
+    const remaining = liveDrag.inCardOffset + dy;
+    const progress = Math.max(0, Math.min(1, 1 - Math.abs(remaining / liveDrag.inCardOffset)));
     videoAreaEl.style.transform = `translateY(${dy}px)`;
-    liveDrag.inCard.style.transform = `translateY(${liveDrag.inCardOffset + dy}px)`;
+    liveDrag.inCard.style.transform = `translateY(${remaining}px) scale(${0.88 + 0.12 * progress})`;
+    liveDrag.inCard.style.opacity = progress;
   }
 
   function endLiveDrag(y) {
@@ -1420,8 +1423,9 @@
     const ease = 'cubic-bezier(0.4,0,0.2,1)';
     videoAreaEl.style.transition = `transform ${dur}s ${ease}`;
     videoAreaEl.style.transform = `translateY(${outDy}px)`;
-    inCard.style.transition = `transform ${dur}s ${ease}`;
-    inCard.style.transform = 'translateY(0)';
+    inCard.style.transition = `transform ${dur}s ${ease}, opacity ${dur}s ${ease}`;
+    inCard.style.transform = 'translateY(0) scale(1)';
+    inCard.style.opacity = '1';
     setTimeout(() => {
       broadcastIdx = nextIdx;
       if (!b.portrait) videoAreaEl.style.height = '221px';
@@ -1453,8 +1457,9 @@
     videoAreaEl.style.transition = `transform 0.28s ${ease}`;
     videoAreaEl.style.transform = 'translateY(0)';
     if (inCard) {
-      inCard.style.transition = `transform 0.28s ${ease}`;
-      inCard.style.transform = `translateY(${startOff}px)`;
+      inCard.style.transition = `transform 0.28s ${ease}, opacity 0.28s ${ease}`;
+      inCard.style.transform = `translateY(${startOff}px) scale(0.88)`;
+      inCard.style.opacity = '0';
       setTimeout(() => inCard.remove(), 300);
     }
     setTimeout(() => { videoAreaEl.style.transition = ''; videoAreaEl.style.transform = ''; }, 300);
