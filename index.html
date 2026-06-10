@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>SOOP 라이브 플레이어</title>
+  <!-- PWA -->
+  <link rel="manifest" href="/soop-live-player/manifest.json" />
+  <meta name="theme-color" content="#17191c" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SOOP" />
+  <link rel="apple-touch-icon" href="/soop-live-player/assets/icon-192.png" />
+  <!-- Fonts -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
   <style>
@@ -1885,6 +1894,14 @@
     mockupToggle.classList.toggle('is-on', isMockupOn);
     mockupToggle.querySelector('span').textContent = isMockupOn ? '목업 ON' : '목업 OFF';
   });
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/soop-live-player/sw.js', { scope: '/soop-live-player/' })
+        .catch(() => {});
+    });
+  }
 </script>
 </body>
 </html>
