@@ -1379,7 +1379,8 @@
       const nIdx = SCROLL_ORDER[nextPos];
       const b = broadcasts[nIdx];
       const dims = getLiveDragDims(b);
-      const offset = dir > 0 ? dims.h : -dims.h;
+      const extra = b.portrait ? 0 : 100;
+      const offset = dir > 0 ? dims.h + extra : -(dims.h + extra);
       const card = document.createElement('div');
       card.style.cssText = [
         'position:absolute', `top:${dims.top}px`, 'left:0', 'right:0', `height:${dims.h}px`,
@@ -1436,17 +1437,28 @@
       if (!b.portrait && spacerEl) spacerEl.style.transition = 'none';
       updateBroadcastInfo(b);
       if (!b.portrait && spacerEl) spacerEl.getBoundingClientRect();
-      inCard.remove();
-      showScrollPanel(); goToSlide(0);
-      const sc = document.getElementById('scrollChatInner');
-      if (sc) sc.innerHTML = '';
-      clearTimeout(autoSlideTimer);
-      autoSlideTimer = setTimeout(() => { goToSlide(1); }, 2000);
-      isChangingBroadcast = false;
-      setTimeout(() => {
-        videoAreaEl.style.transition = '';
-        if (spacerEl) spacerEl.style.transition = '';
-      }, 30);
+      let done = false;
+      const finalize = () => {
+        if (done) return; done = true;
+        inCard.remove();
+        showScrollPanel(); goToSlide(0);
+        const sc = document.getElementById('scrollChatInner');
+        if (sc) sc.innerHTML = '';
+        clearTimeout(autoSlideTimer);
+        autoSlideTimer = setTimeout(() => { goToSlide(1); }, 2000);
+        isChangingBroadcast = false;
+        setTimeout(() => {
+          videoAreaEl.style.transition = '';
+          if (spacerEl) spacerEl.style.transition = '';
+        }, 30);
+      };
+      const mainVid = videoAreaEl.querySelector('.video-bg');
+      if (mainVid) {
+        mainVid.addEventListener('canplay', () => requestAnimationFrame(finalize), { once: true });
+        setTimeout(finalize, 250);
+      } else {
+        finalize();
+      }
     }, Math.round(dur * 1000) + 20);
   }
 
