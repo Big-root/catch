@@ -697,6 +697,15 @@
       position: relative;
       z-index: 4;
     }
+    .app.scroll-mode::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 84px;
+      background: var(--bg-primary);
+      z-index: 9;
+      pointer-events: none;
+    }
     /* portrait 모드에서 광고+safe-area 하단 고정 */
     .app.scroll-mode.portrait-mode .ad-banner {
       position: absolute;
