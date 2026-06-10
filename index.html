@@ -1379,7 +1379,7 @@
       const nIdx = SCROLL_ORDER[nextPos];
       const b = broadcasts[nIdx];
       const dims = getLiveDragDims(b);
-      const extra = b.portrait ? 0 : 100;
+      const extra = b.portrait ? 0 : 200;
       const offset = dir > 0 ? dims.h + extra : -(dims.h + extra);
       const card = document.createElement('div');
       card.style.cssText = [
