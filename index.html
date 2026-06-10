@@ -697,13 +697,20 @@
       position: relative;
       z-index: 4;
     }
-    /* portrait 모드에서 ad-banner를 하단으로 밀고, safe-area는 숨김 */
+    /* portrait 모드에서 광고+safe-area 하단 고정 */
     .app.scroll-mode.portrait-mode .ad-banner {
-      margin-top: auto;
+      position: absolute;
+      bottom: 34px;
+      left: 0; right: 0;
+      z-index: 10;
     }
     .app.scroll-mode.portrait-mode .safe-area {
-      position: relative;
-      z-index: 4;
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      z-index: 10;
+      background: var(--bg-primary);
+      opacity: 1;
     }
 
     /* ── 스크롤 패널 (방송정보 + 채팅 슬라이더) ── */
