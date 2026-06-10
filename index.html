@@ -1353,7 +1353,7 @@
   videoArea.addEventListener('click', showControls);
 
   // ── 영상 라이브 드래그 ──
-  let liveDrag = { active: false, startY: 0, dir: 0, inCard: null, inCardOffset: 0, nextIdx: -1, dy: 0, onVideo: false };
+  let liveDrag = { active: false, startY: 0, dir: 0, inCard: null, inCardOffset: 0, nextIdx: -1, dy: 0, visualDy: 0, currH: 0, onVideo: false };
 
   function getLiveDragDims(b) {
     return b.portrait
@@ -1363,7 +1363,8 @@
 
   function startLiveDrag(y) {
     if (!isScrollMode || isChangingBroadcast || liveDrag.active) return;
-    liveDrag.startY = y; liveDrag.dy = 0;
+    liveDrag.startY = y; liveDrag.dy = 0; liveDrag.visualDy = 0;
+    liveDrag.currH = getLiveDragDims(broadcasts[broadcastIdx]).h;
     liveDrag.active = true; liveDrag.dir = 0;
     liveDrag.inCard = null; liveDrag.onVideo = false;
   }
@@ -1394,9 +1395,12 @@
       videoAreaEl.style.transition = 'none';
     }
     if (!liveDrag.inCard) return;
-    const remaining = liveDrag.inCardOffset + dy;
+    const edy = dy * 0.78;
+    liveDrag.visualDy = edy;
+    const remaining = liveDrag.inCardOffset + edy;
     const progress = Math.max(0, Math.min(1, 1 - Math.abs(remaining / liveDrag.inCardOffset)));
-    videoAreaEl.style.transform = `translateY(${dy}px)`;
+    videoAreaEl.style.transform = `translateY(${edy}px)`;
+    videoAreaEl.style.opacity = Math.max(0, 1 - Math.abs(edy) / liveDrag.currH);
     liveDrag.inCard.style.transform = `translateY(${remaining}px) scale(${0.88 + 0.12 * progress})`;
     liveDrag.inCard.style.opacity = progress;
   }
@@ -1414,16 +1418,17 @@
   function finishLiveDrag() {
     const dir = liveDrag.dir, nextIdx = liveDrag.nextIdx;
     const b = broadcasts[nextIdx], currB = broadcasts[broadcastIdx];
-    const inCard = liveDrag.inCard, currDy = liveDrag.dy;
+    const inCard = liveDrag.inCard, currVisualDy = liveDrag.visualDy;
     liveDrag.inCard = null;
     isChangingBroadcast = true;
     const dims = getLiveDragDims(currB);
     const outDy = dir > 0 ? -dims.h : dims.h;
-    const remaining = Math.abs(outDy - currDy);
-    const dur = Math.max(0.15, 0.35 * remaining / Math.abs(outDy));
-    const ease = 'cubic-bezier(0.4,0,0.2,1)';
-    videoAreaEl.style.transition = `transform ${dur}s ${ease}`;
+    const remaining = Math.abs(outDy - currVisualDy);
+    const dur = Math.max(0.2, 0.4 * remaining / Math.abs(outDy));
+    const ease = 'cubic-bezier(0.22,1,0.36,1)';
+    videoAreaEl.style.transition = `transform ${dur}s ${ease}, opacity ${dur}s ${ease}`;
     videoAreaEl.style.transform = `translateY(${outDy}px)`;
+    videoAreaEl.style.opacity = '0';
     inCard.style.transition = `transform ${dur}s ${ease}, opacity ${dur}s ${ease}`;
     inCard.style.transform = 'translateY(0) scale(1)';
     inCard.style.opacity = '1';
@@ -1433,6 +1438,7 @@
       else videoAreaEl.style.height = '';
       videoAreaEl.style.transition = 'none';
       videoAreaEl.style.transform = '';
+      videoAreaEl.style.opacity = '';
       const spacerEl = document.getElementById('scrollTopSpacer');
       if (!b.portrait && spacerEl) spacerEl.style.transition = 'none';
       updateBroadcastInfo(b);
@@ -1465,16 +1471,17 @@
   function cancelLiveDrag() {
     const inCard = liveDrag.inCard, startOff = liveDrag.inCardOffset;
     liveDrag.inCard = null; liveDrag.dir = 0;
-    const ease = 'cubic-bezier(0.4,0,0.2,1)';
-    videoAreaEl.style.transition = `transform 0.28s ${ease}`;
+    const ease = 'cubic-bezier(0.34,1.56,0.64,1)';
+    videoAreaEl.style.transition = `transform 0.32s ${ease}, opacity 0.32s ${ease}`;
     videoAreaEl.style.transform = 'translateY(0)';
+    videoAreaEl.style.opacity = '1';
     if (inCard) {
-      inCard.style.transition = `transform 0.28s ${ease}, opacity 0.28s ${ease}`;
+      inCard.style.transition = `transform 0.32s ${ease}, opacity 0.32s ${ease}`;
       inCard.style.transform = `translateY(${startOff}px) scale(0.88)`;
       inCard.style.opacity = '0';
-      setTimeout(() => inCard.remove(), 300);
+      setTimeout(() => inCard.remove(), 350);
     }
-    setTimeout(() => { videoAreaEl.style.transition = ''; videoAreaEl.style.transform = ''; }, 300);
+    setTimeout(() => { videoAreaEl.style.transition = ''; videoAreaEl.style.transform = ''; videoAreaEl.style.opacity = ''; }, 350);
   }
 
   videoArea.addEventListener('touchstart', (e) => {
