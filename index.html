@@ -1677,6 +1677,11 @@
 
     let pull = { active: false, startY: 0, dy: 0, lastY: 0, lastT: 0, velocity: 0 };
 
+    function setDragTransform(val) {
+      msgWrap.style.transform = val;
+      dragHandle.style.transform = val;
+    }
+
     function pullStart(y) {
       if (isScrollMode) return;
       pull.active = true;
@@ -1686,6 +1691,7 @@
       pull.lastT = Date.now();
       pull.velocity = 0;
       msgWrap.style.transition = 'none';
+      dragHandle.style.transition = 'none';
     }
 
     function pullMove(y) {
@@ -1693,25 +1699,28 @@
       const now = Date.now();
       const dt = now - pull.lastT;
       if (dt > 0) {
-        pull.velocity = (y - pull.lastY) / dt; // px/ms (양수 = 아래방향)
+        pull.velocity = (y - pull.lastY) / dt;
         pull.lastY = y;
         pull.lastT = now;
       }
       const raw = y - pull.startY;
       if (raw <= 0) {
         pull.dy = 0;
-        msgWrap.style.transform = '';
+        setDragTransform('');
         return;
       }
       const damped = raw * 0.6;
       pull.dy = damped;
-      msgWrap.style.transform = `translateY(${damped}px)`;
+      setDragTransform(`translateY(${damped}px)`);
     }
 
     function commitPull() {
       const wrapH = msgWrap.offsetHeight;
-      msgWrap.style.transition = 'transform 0.22s cubic-bezier(0.4,0,1,1)';
+      const ease = 'transform 0.22s cubic-bezier(0.4,0,1,1)';
+      msgWrap.style.transition = ease;
       msgWrap.style.transform = `translateY(${wrapH}px)`;
+      dragHandle.style.transition = ease;
+      dragHandle.style.transform = `translateY(${wrapH}px)`;
       if (chatInputBar) {
         chatInputBar.style.transition = 'opacity 0.18s ease';
         chatInputBar.style.opacity = '0';
@@ -1719,14 +1728,21 @@
       setTimeout(() => {
         enterScrollMode();
         msgWrap.style.cssText = '';
+        dragHandle.style.cssText = '';
         if (chatInputBar) chatInputBar.style.cssText = '';
       }, 230);
     }
 
     function snapBack() {
-      msgWrap.style.transition = 'transform 0.38s cubic-bezier(0.34,1.56,0.64,1)';
+      const ease = 'transform 0.38s cubic-bezier(0.34,1.56,0.64,1)';
+      msgWrap.style.transition = ease;
       msgWrap.style.transform = 'translateY(0)';
-      setTimeout(() => { msgWrap.style.cssText = ''; }, 420);
+      dragHandle.style.transition = ease;
+      dragHandle.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        msgWrap.style.cssText = '';
+        dragHandle.style.cssText = '';
+      }, 420);
     }
 
     function pullEnd() {
