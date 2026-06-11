@@ -211,15 +211,22 @@
       position: relative;
       overflow: hidden;
     }
-    .chat-messages-wrap {
+    /* 채팅 메시지 클립 컨테이너 — 입력바 위에서 크롭 */
+    .chat-messages-clip {
       flex: 1;
       min-height: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .chat-messages-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* 드래그 핸들 */
+    /* 드래그 핸들 — 터치 영역 44px, 시각 바는 상단 22px 중앙 */
     .drag-handle {
       position: absolute;
       top: 0;
@@ -227,8 +234,9 @@
       right: 0;
       height: 44px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding-top: 9px;
       z-index: 10;
       cursor: grab;
       touch-action: none;
@@ -236,8 +244,9 @@
     .drag-handle-bar {
       width: 40px;
       height: 4px;
-      background: var(--fill-quaternary);
-      border-radius: 2.5px;
+      background: rgba(145,150,161,0.3);
+      border-radius: 2px;
+      transition: background 0.2s;
     }
 
     .chat-scroll {
@@ -1008,6 +1017,7 @@
     <!-- 드래그 핸들 -->
     <div class="drag-handle"><div class="drag-handle-bar"></div></div>
 
+    <div class="chat-messages-clip">
     <div class="chat-messages-wrap">
     <div class="chat-scroll" id="chatScroll">
       <div class="chat-inner" id="chatInner">
@@ -1148,6 +1158,7 @@
       </div>
     </div>
     </div><!-- /.chat-messages-wrap -->
+    </div><!-- /.chat-messages-clip -->
 
     <!-- 채팅 입력바 -->
     <div class="chat-input-bar">
@@ -1659,6 +1670,7 @@
   (function() {
     const dragHandle = document.querySelector('.drag-handle');
     const chatArea = document.querySelector('.chat-area');
+    const msgClip = document.querySelector('.chat-messages-clip');
     const msgWrap = document.querySelector('.chat-messages-wrap');
     const chatInputBar = chatArea ? chatArea.querySelector('.chat-input-bar') : null;
     if (!dragHandle || !chatArea || !msgWrap) return;
