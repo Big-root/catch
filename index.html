@@ -1864,12 +1864,20 @@
   }, { passive: true });
 
   // 드래그 핸들: 패널 높이 조절
-  let dragY0 = 0, dragH0 = 0, isDraggingPanel = false;
+  let dragY0 = 0, dragH0 = 0, isDraggingPanel = false, overDrag = 0;
+  const OVER_EXIT_THRESHOLD = 44; // maxH 초과 px → 일반모드 전환
+
+  function applyPanelOverDrag(over) {
+    // 초과 드래그만큼 패널을 위로 rubber-band
+    const rb = over > 0 ? -(over * 0.35) : 0;
+    scrollPanel.style.transform = rb !== 0 ? `translateY(${rb}px)` : '';
+  }
 
   scrollPanelHandle.addEventListener('touchstart', (e) => {
     dragY0 = e.touches[0].clientY;
     dragH0 = panelHeight;
     isDraggingPanel = true;
+    overDrag = 0;
     scrollPanelHandle.classList.add('dragging');
     scrollPanel.style.transition = 'none';
     e.stopPropagation();
@@ -1880,8 +1888,10 @@
     if (!isDraggingPanel) return;
     const dy = dragY0 - e.touches[0].clientY;
     const maxH = getPanelMaxH();
+    overDrag = Math.max(0, dragH0 + dy - maxH);
     panelHeight = Math.min(maxH, Math.max(60, dragH0 + dy));
     scrollPanel.style.height = panelHeight + 'px';
+    applyPanelOverDrag(overDrag);
     updateCtrlBottomPos();
   }, { passive: true });
 
@@ -1889,7 +1899,16 @@
     if (!isDraggingPanel) return;
     isDraggingPanel = false;
     scrollPanelHandle.classList.remove('dragging');
+    const savedOver = overDrag;
+    overDrag = 0;
     scrollPanel.style.transition = 'height 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease, transform 0.25s ease';
+    scrollPanel.style.transform = '';
+
+    if (savedOver >= OVER_EXIT_THRESHOLD) {
+      exitScrollMode();
+      return;
+    }
+
     const maxH = getPanelMaxH();
     const mid = (PANEL_MIN_H + maxH) / 2;
     if (panelHeight < PANEL_SNAP_MIN) {
@@ -1920,6 +1939,7 @@
     dragY0 = e.clientY;
     dragH0 = panelHeight;
     isDraggingPanel = true;
+    overDrag = 0;
     scrollPanelHandle.classList.add('dragging');
     scrollPanel.style.transition = 'none';
     e.stopPropagation();
@@ -1931,8 +1951,10 @@
     if (isDraggingPanel) {
       const dy = dragY0 - e.clientY;
       const maxH = getPanelMaxH();
+      overDrag = Math.max(0, dragH0 + dy - maxH);
       panelHeight = Math.min(maxH, Math.max(60, dragH0 + dy));
       scrollPanel.style.height = panelHeight + 'px';
+      applyPanelOverDrag(overDrag);
       updateCtrlBottomPos();
     }
     if (isMouseSwiping) {
@@ -1946,19 +1968,27 @@
     if (isDraggingPanel) {
       isDraggingPanel = false;
       scrollPanelHandle.classList.remove('dragging');
+      const savedOver = overDrag;
+      overDrag = 0;
       scrollPanel.style.transition = 'height 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease, transform 0.25s ease';
-      const maxH = getPanelMaxH();
-      const mid = (PANEL_MIN_H + maxH) / 2;
-      if (panelHeight < PANEL_SNAP_MIN) {
-        hideScrollPanel();
-      } else if (panelHeight > mid) {
-        panelHeight = maxH;
-        scrollPanel.style.height = panelHeight + 'px';
+      scrollPanel.style.transform = '';
+
+      if (savedOver >= OVER_EXIT_THRESHOLD) {
+        exitScrollMode();
       } else {
-        panelHeight = PANEL_MIN_H;
-        scrollPanel.style.height = panelHeight + 'px';
+        const maxH = getPanelMaxH();
+        const mid = (PANEL_MIN_H + maxH) / 2;
+        if (panelHeight < PANEL_SNAP_MIN) {
+          hideScrollPanel();
+        } else if (panelHeight > mid) {
+          panelHeight = maxH;
+          scrollPanel.style.height = panelHeight + 'px';
+        } else {
+          panelHeight = PANEL_MIN_H;
+          scrollPanel.style.height = panelHeight + 'px';
+        }
+        updateCtrlBottomPos();
       }
-      updateCtrlBottomPos();
     }
     if (isMouseSwiping) {
       isMouseSwiping = false;
