@@ -217,13 +217,14 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 40px;
-      height: 24px;
+      width: 120px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10;
       cursor: grab;
+      touch-action: none;
     }
     .drag-handle-bar {
       width: 40px;
@@ -1644,6 +1645,81 @@
     e.stopPropagation();
     isScrollMode ? exitScrollMode() : enterScrollMode();
   });
+
+  // ── 채팅 핸들 풀다운 → 스크롤 모드 진입 ──
+  (function() {
+    const dragHandle = document.querySelector('.drag-handle');
+    const chatArea = document.querySelector('.chat-area');
+    if (!dragHandle || !chatArea) return;
+
+    let pull = { active: false, startY: 0, dy: 0 };
+
+    function pullStart(y) {
+      if (isScrollMode) return;
+      pull.active = true;
+      pull.startY = y;
+      pull.dy = 0;
+      chatArea.style.transition = 'none';
+    }
+
+    function pullMove(y) {
+      if (!pull.active) return;
+      const raw = y - pull.startY;
+      if (raw <= 0) {
+        pull.dy = 0;
+        chatArea.style.transform = '';
+        return;
+      }
+      const damped = raw * 0.55;
+      pull.dy = damped;
+      chatArea.style.transform = `translateY(${damped}px)`;
+    }
+
+    function pullEnd() {
+      if (!pull.active) return;
+      pull.active = false;
+      const THRESHOLD = 55;
+      if (pull.dy >= THRESHOLD) {
+        const chatH = chatArea.offsetHeight;
+        chatArea.style.transition = 'transform 0.22s cubic-bezier(0.4,0,1,1), opacity 0.18s ease';
+        chatArea.style.transform = `translateY(${chatH}px)`;
+        chatArea.style.opacity = '0';
+        setTimeout(() => {
+          enterScrollMode();          // scroll-mode CSS가 opacity:0 잡아줌
+          chatArea.style.cssText = ''; // 그 다음 인라인 스타일 제거
+        }, 230);
+      } else {
+        chatArea.style.transition = 'transform 0.38s cubic-bezier(0.34,1.56,0.64,1)';
+        chatArea.style.transform = 'translateY(0)';
+        setTimeout(() => { chatArea.style.cssText = ''; }, 420);
+      }
+    }
+
+    function pullCancel() {
+      if (!pull.active) return;
+      pull.active = false;
+      chatArea.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+      chatArea.style.transform = 'translateY(0)';
+      setTimeout(() => { chatArea.style.cssText = ''; }, 380);
+    }
+
+    dragHandle.addEventListener('touchstart', (e) => pullStart(e.touches[0].clientY), { passive: true });
+    dragHandle.addEventListener('touchmove', (e) => pullMove(e.touches[0].clientY), { passive: true });
+    dragHandle.addEventListener('touchend', pullEnd);
+    dragHandle.addEventListener('touchcancel', pullCancel);
+
+    dragHandle.addEventListener('mousedown', (e) => {
+      pullStart(e.clientY);
+      const onMove = (ev) => pullMove(ev.clientY);
+      const onUp = () => {
+        pullEnd();
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    });
+  })();
 
   // ── 스크롤 패널: 슬라이드 + 드래그 리사이즈 ──
   const scrollPanel = document.getElementById('scrollPanel');
