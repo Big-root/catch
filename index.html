@@ -209,6 +209,14 @@
       flex-direction: column;
       min-height: 0;
       position: relative;
+      overflow: hidden;
+    }
+    .chat-messages-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     /* 드래그 핸들 */
@@ -1001,6 +1009,7 @@
     <!-- 드래그 핸들 -->
     <div class="drag-handle"><div class="drag-handle-bar"></div></div>
 
+    <div class="chat-messages-wrap">
     <div class="chat-scroll" id="chatScroll">
       <div class="chat-inner" id="chatInner">
 
@@ -1139,6 +1148,7 @@
 
       </div>
     </div>
+    </div><!-- /.chat-messages-wrap -->
 
     <!-- 채팅 입력바 -->
     <div class="chat-input-bar">
@@ -1650,57 +1660,80 @@
   (function() {
     const dragHandle = document.querySelector('.drag-handle');
     const chatArea = document.querySelector('.chat-area');
-    if (!dragHandle || !chatArea) return;
+    const msgWrap = document.querySelector('.chat-messages-wrap');
+    const chatInputBar = chatArea ? chatArea.querySelector('.chat-input-bar') : null;
+    if (!dragHandle || !chatArea || !msgWrap) return;
 
-    let pull = { active: false, startY: 0, dy: 0 };
+    let pull = { active: false, startY: 0, dy: 0, lastY: 0, lastT: 0, velocity: 0 };
 
     function pullStart(y) {
       if (isScrollMode) return;
       pull.active = true;
       pull.startY = y;
       pull.dy = 0;
-      chatArea.style.transition = 'none';
+      pull.lastY = y;
+      pull.lastT = Date.now();
+      pull.velocity = 0;
+      msgWrap.style.transition = 'none';
     }
 
     function pullMove(y) {
       if (!pull.active) return;
+      const now = Date.now();
+      const dt = now - pull.lastT;
+      if (dt > 0) {
+        pull.velocity = (y - pull.lastY) / dt; // px/ms (양수 = 아래방향)
+        pull.lastY = y;
+        pull.lastT = now;
+      }
       const raw = y - pull.startY;
       if (raw <= 0) {
         pull.dy = 0;
-        chatArea.style.transform = '';
+        msgWrap.style.transform = '';
         return;
       }
-      const damped = raw * 0.55;
+      const damped = raw * 0.6;
       pull.dy = damped;
-      chatArea.style.transform = `translateY(${damped}px)`;
+      msgWrap.style.transform = `translateY(${damped}px)`;
+    }
+
+    function commitPull() {
+      const wrapH = msgWrap.offsetHeight;
+      msgWrap.style.transition = 'transform 0.22s cubic-bezier(0.4,0,1,1)';
+      msgWrap.style.transform = `translateY(${wrapH}px)`;
+      if (chatInputBar) {
+        chatInputBar.style.transition = 'opacity 0.18s ease';
+        chatInputBar.style.opacity = '0';
+      }
+      setTimeout(() => {
+        enterScrollMode();
+        msgWrap.style.cssText = '';
+        if (chatInputBar) chatInputBar.style.cssText = '';
+      }, 230);
+    }
+
+    function snapBack() {
+      msgWrap.style.transition = 'transform 0.38s cubic-bezier(0.34,1.56,0.64,1)';
+      msgWrap.style.transform = 'translateY(0)';
+      setTimeout(() => { msgWrap.style.cssText = ''; }, 420);
     }
 
     function pullEnd() {
       if (!pull.active) return;
       pull.active = false;
-      const THRESHOLD = 55;
-      if (pull.dy >= THRESHOLD) {
-        const chatH = chatArea.offsetHeight;
-        chatArea.style.transition = 'transform 0.22s cubic-bezier(0.4,0,1,1), opacity 0.18s ease';
-        chatArea.style.transform = `translateY(${chatH}px)`;
-        chatArea.style.opacity = '0';
-        setTimeout(() => {
-          enterScrollMode();          // scroll-mode CSS가 opacity:0 잡아줌
-          chatArea.style.cssText = ''; // 그 다음 인라인 스타일 제거
-        }, 230);
+      const DIST_THRESHOLD = 45;   // 댐핑 후 px
+      const VEL_THRESHOLD  = 0.35; // px/ms (플릭)
+      if (pull.dy >= DIST_THRESHOLD || pull.velocity >= VEL_THRESHOLD) {
+        commitPull();
       } else {
-        chatArea.style.transition = 'transform 0.38s cubic-bezier(0.34,1.56,0.64,1)';
-        chatArea.style.transform = 'translateY(0)';
-        setTimeout(() => { chatArea.style.cssText = ''; }, 420);
+        snapBack();
       }
     }
 
     function pullCancel() {
       if (!pull.active) return;
       pull.active = false;
-      chatArea.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
-      chatArea.style.transform = 'translateY(0)';
-      setTimeout(() => { chatArea.style.cssText = ''; }, 380);
+      snapBack();
     }
 
     dragHandle.addEventListener('touchstart', (e) => pullStart(e.touches[0].clientY), { passive: true });
