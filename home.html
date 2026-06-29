@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>SOOP 홈</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --label-primary-deep: #17191c;
+      --label-primary:      #17191c;
+      --label-secondary:    #525661;
+      --label-tertiary:     #757b8a;
+      --label-quaternary:   #acb0b9;
+      --bg-primary:         #ffffff;
+      --bg-secondary:       #f5f6f8;
+      --accent:             #0182ff;
+      --mid10:              rgba(145,150,161,0.1);
+      --mid20:              rgba(145,150,161,0.2);
+      --dark5:              rgba(23,25,28,0.05);
+      --dark80:             rgba(23,25,28,0.8);
+      --pink:               #ff6678;
+      --live-dot:           #ff2f00;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    /* ── 폰 목업 ── */
+    .phone-frame {
+      position: relative;
+      width: 399px; height: 836px;
+      flex-shrink: 0;
+      transition: width 0.3s ease, height 0.3s ease;
+    }
+    .phone-frame::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 50px;
+      background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 40%, #222 100%);
+      box-shadow: 0 0 0 1px #3a3a3a, 0 0 0 2px #1a1a1a,
+                  0 30px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.08);
+      z-index: 0;
+    }
+    .phone-screen {
+      position: absolute; inset: 12px;
+      border-radius: 40px; overflow: hidden;
+      z-index: 1; background: var(--bg-primary);
+      display: flex; flex-direction: column;
+      transition: inset 0.3s ease, border-radius 0.3s ease;
+    }
+    .btn-side-left {
+      position: absolute; left: -3px; top: 120px;
+      width: 4px; height: 30px;
+      background: #2a2a2a; border-radius: 2px 0 0 2px;
+      box-shadow: -1px 0 2px rgba(0,0,0,0.5);
+    }
+    .btn-side-left::before, .btn-side-left::after {
+      content: ''; position: absolute; left: 0;
+      width: 4px; height: 58px;
+      background: #2a2a2a; border-radius: 2px 0 0 2px;
+    }
+    .btn-side-left::before { top: 46px; }
+    .btn-side-left::after  { top: 116px; }
+    .btn-side-right {
+      position: absolute; right: -3px; top: 180px;
+      width: 4px; height: 74px;
+      background: #2a2a2a; border-radius: 0 2px 2px 0;
+    }
+    .phone-frame.no-frame { width: 375px; height: 812px; }
+    .phone-frame.no-frame::before { display: none; }
+    .phone-frame.no-frame .btn-side-left,
+    .phone-frame.no-frame .btn-side-right { display: none; }
+    .phone-frame.no-frame .phone-screen { inset: 0; border-radius: 12px; }
+
+    /* ── 앱 ── */
+    .home-app {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      background: var(--bg-primary);
+      overflow: hidden;
+    }
+
+    /* ── 상태바 ── */
+    .status-bar {
+      display: flex; align-items: flex-start;
+      justify-content: space-between;
+      height: 54px; flex-shrink: 0;
+      padding-top: 14px;
+    }
+    .status-time {
+      padding-left: 20px;
+      font-size: 17px; font-weight: 590; color: #000;
+      font-family: -apple-system, 'SF Pro Text', sans-serif;
+    }
+    .status-icons {
+      padding-right: 16px;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ── 네비게이션 바 ── */
+    .nav-bar {
+      height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 8px; position: relative;
+    }
+    .nav-logo {
+      font-size: 22px; font-weight: 900; color: #000;
+      letter-spacing: -1px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-left {
+      position: absolute; left: 8px; top: 0;
+      display: flex; align-items: center; height: 44px;
+    }
+    .nav-right {
+      position: absolute; right: 8px; top: 0;
+      display: flex; align-items: center; height: 44px;
+    }
+    .nav-icon-btn {
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    /* ── 캡슐 탭 ── */
+    .capsule-tabs {
+      height: 56px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+    }
+    .cap-tab {
+      height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 3px;
+      padding: 0 13px;
+      border-radius: 20px;
+      background: var(--mid10);
+      font-size: 13px; font-weight: 500;
+      color: var(--label-secondary);
+      white-space: nowrap;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .cap-tab.active {
+      background: transparent;
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── 텍스트 탭 ── */
+    .text-tabs {
+      height: 44px; flex-shrink: 0;
+      display: flex; align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(145,150,161,0.1);
+    }
+    .txt-tab {
+      flex: 1; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 400;
+      color: var(--label-tertiary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .txt-tab.active {
+      font-weight: 600;
+      color: var(--label-primary-deep);
+    }
+
+    /* ── 스크롤 콘텐츠 ── */
+    .scroll-content {
+      flex: 1; overflow-y: auto; min-height: 0;
+    }
+    .scroll-content::-webkit-scrollbar { width: 0; }
+
+    /* ── 광고 배너 섹션 ── */
+    .section-banner {
+      padding: 12px;
+    }
+    .ad-banner-card {
+      width: 100%;
+      border-radius: 20px;
+      background: rgba(235,239,246,0.85);
+      border: 1px solid rgba(23,25,28,0.05);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      gap: 12px;
+    }
+    .ad-banner-text { flex: 1; }
+    .ad-banner-title {
+      font-size: 15px; font-weight: 700; color: #17191c;
+      margin-bottom: 4px;
+    }
+    .ad-banner-sub {
+      font-size: 13px; font-weight: 400; color: #525661;
+    }
+    .ad-banner-img {
+      width: 110px; height: 64px;
+      object-fit: contain; flex-shrink: 0;
+    }
+    .ad-car-placeholder {
+      width: 110px; height: 64px;
+      background: linear-gradient(135deg, #c8cbd4, #e0e3ea);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #757b8a; font-size: 10px;
+      flex-shrink: 0;
+    }
+
+    /* ── 섹션 리스트 ── */
+    .section-list { padding-bottom: 12px; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px;
+      height: 48px;
+    }
+    .section-title {
+      font-size: 18px; font-weight: 600; color: var(--label-primary-deep);
+    }
+    .sort-row {
+      display: flex; align-items: center;
+      padding: 0 12px;
+      height: 40px;
+      gap: 4px;
+    }
+    .sort-label {
+      font-size: 13px; font-weight: 400; color: var(--label-tertiary);
+    }
+    .sort-arrow { margin-left: 2px; }
+
+    /* ── 라이브 리스트 아이템 ── */
+    .live-list { display: flex; flex-direction: column; gap: 12px; padding: 0 0 12px; }
+    .live-item {
+      display: flex; align-items: flex-start;
+      padding: 0 12px 0 12px; gap: 0;
+      cursor: pointer;
+    }
+
+    /* 썸네일 */
+    .thumb-wrap {
+      width: 152px; height: 89px;
+      border-radius: 16px;
+      overflow: hidden; flex-shrink: 0;
+      position: relative;
+      background: #000;
+    }
+    .thumb-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .thumb-badge-left {
+      position: absolute; top: 7px; left: 7px;
+      display: flex; gap: 4px; align-items: center;
+    }
+    .badge-live {
+      background: rgba(23,25,28,0.8);
+      border-radius: 9px;
+      height: 18px;
+      padding: 0 6px;
+      display: flex; align-items: center; gap: 3px;
+      font-size: 12px; font-weight: 600; color: #fff;
+    }
+    .badge-live-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%; background: var(--live-dot);
+      flex-shrink: 0;
+    }
+    .badge-sub-plus {
+      background: rgba(23,25,28,0.8);
+      border: 1px solid var(--pink);
+      border-radius: 10px;
+      height: 18px; padding: 0 6px;
+      display: flex; align-items: center; gap: 2px;
+    }
+    .badge-sub-plus-text {
+      font-size: 11px; font-weight: 500;
+      background: linear-gradient(92deg, #ff6678 9%, #ffb400 124%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge-sub-plus-icon {
+      width: 8px; height: 8px;
+      background: linear-gradient(92deg, #ff6678, #ffb400);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .badge-19 {
+      position: absolute; top: 7px; right: 7px;
+      width: 18px; height: 18px;
+      background: rgba(239,86,95,0.9);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: #fff;
+      line-height: 1;
+    }
+
+    /* 정보 영역 */
+    .live-info {
+      flex: 1; min-width: 0;
+      padding-left: 12px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .live-nick-row {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .live-nick-profile {
+      width: 20px; height: 20px;
+      border-radius: 50%; object-fit: cover;
+      flex-shrink: 0; background: #ccc;
+    }
+    .live-nick {
+      font-size: 14px; font-weight: 500; color: var(--label-primary-deep);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .nick-badge {
+      width: 14px; height: 14px; flex-shrink: 0;
+    }
+    .nick-badge-sub {
+      background: #e8a730; border-radius: 3px;
+      width: 14px; height: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; font-weight: 700; color: #fff;
+    }
+    .nick-badge-fan {
+      background: #75aa5c; border-radius: 3px;
+      width: 14px; height: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; font-weight: 700; color: #fff;
+    }
+    .live-title {
+      font-size: 15px; font-weight: 400; color: var(--label-primary-deep);
+      line-height: 1.3;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .live-tags {
+      display: flex; gap: 4px; align-items: center;
+      padding: 2px 0;
+      overflow: hidden;
+    }
+    .live-tag {
+      height: 20px; padding: 0 8px;
+      border-radius: 10px;
+      font-size: 12px; font-weight: 400; color: var(--label-tertiary);
+      white-space: nowrap;
+    }
+    .live-tag.dark { background: var(--mid20); }
+    .live-tag.light { background: var(--mid10); }
+    .live-more-btn {
+      width: 32px; height: 23px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; cursor: pointer;
+    }
+    .live-more-dots {
+      display: flex; flex-direction: column; gap: 3px;
+      align-items: center;
+    }
+    .live-more-dots span {
+      width: 3px; height: 3px;
+      border-radius: 50%; background: var(--label-quaternary);
+      display: block;
+    }
+
+    /* ── 하단 탭바 ── */
+    .bottom-tabbar {
+      background: var(--bg-primary);
+      border-top: 1px solid rgba(145,150,161,0.12);
+      flex-shrink: 0;
+    }
+    .tabbar-inner { display: flex; align-items: stretch; }
+    .tab-item {
+      flex: 1; height: 52px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      position: relative; overflow: hidden;
+      cursor: pointer; text-decoration: none;
+    }
+    .tab-icon {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tab-label {
+      font-size: 10px; font-weight: 500;
+      color: var(--label-quaternary);
+      position: absolute; bottom: 7px; white-space: nowrap;
+    }
+    .tab-item.active .tab-label { color: var(--label-secondary); }
+    .safe-area { height: 34px; background: var(--bg-primary); flex-shrink: 0; }
+
+    /* ── 목업 토글 ── */
+    .mockup-toggle {
+      position: fixed; top: 16px; right: 16px; z-index: 9999;
+      display: flex; align-items: center; gap: 6px;
+      background: #2a2d33; border: 1px solid #3a3e47; color: #9196a1;
+      font-family: 'Pretendard', sans-serif; font-size: 12px; font-weight: 500;
+      padding: 7px 13px; border-radius: 20px;
+      cursor: pointer; user-select: none; outline: none;
+      appearance: none; -webkit-appearance: none;
+    }
+    .mockup-toggle.is-on { background: #0e2a45; border-color: #0182ff; color: #0182ff; }
+
+    @media (max-width: 500px) {
+      body { padding: 0; background: #fff; }
+      .phone-frame { width: 100vw; height: 100vh; background: none; }
+      .phone-frame::before { display: none; }
+      .phone-screen { inset: 0; border-radius: 0; }
+      .btn-side-left, .btn-side-right { display: none; }
+      .mockup-toggle { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="phone-frame" id="phoneFrame">
+  <div class="btn-side-left"></div>
+  <div class="btn-side-right"></div>
+  <div class="phone-screen">
+
+  <div class="home-app">
+
+    <!-- 상태바 -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+          <rect x="0" y="7" width="3" height="5" rx="1" fill="black"/>
+          <rect x="4.5" y="5" width="3" height="7" rx="1" fill="black"/>
+          <rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="black"/>
+          <rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/>
+        </svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5z" fill="black"/>
+          <path d="M1.5 5.5C3.26 3.74 5.51 2.75 8 2.75s4.74.99 6.5 2.75" stroke="black" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M4 7.5C5.15 6.35 6.5 5.75 8 5.75s2.85.6 4 1.75" stroke="black" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+          <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/>
+          <rect x="2" y="2" width="18" height="8" rx="2" fill="black"/>
+          <path d="M23 4v4a2 2 0 0 0 0-4z" fill="black" fill-opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 네비게이션 바 -->
+    <div class="nav-bar">
+      <!-- SOOP 로고 -->
+      <img src="https://www.figma.com/api/mcp/asset/4f28473c-225e-47b3-a83c-2db27d8edae9" alt="SOOP" style="height:27px; object-fit:contain;" onerror="this.style.display='none'; this.nextSibling.style.display='block'"/>
+      <span class="nav-logo" style="display:none;">S<span>OO</span>P</span>
+
+      <!-- 왼쪽: 업로드 -->
+      <div class="nav-left">
+        <div class="nav-icon-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="4" stroke="#17191c" stroke-width="1.7" fill="none"/>
+            <path d="M12 8v8M9 11l3-3 3 3" stroke="#17191c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 알림 + 검색 -->
+      <div class="nav-right">
+        <div class="nav-icon-btn" style="position:relative;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M4.5 10C4.5 6.41 7.41 3.5 11 3.5H13C16.59 3.5 19.5 6.41 19.5 10V16.5H4.5V10Z" stroke="#17191c" stroke-width="1.7" fill="none"/>
+            <path d="M3 16.5h18" stroke="#17191c" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M10 19.5a2 2 0 0 0 4 0" stroke="#17191c" stroke-width="1.7" fill="none"/>
+          </svg>
+          <!-- 알림 빨간 점 -->
+          <div style="position:absolute; top:10px; right:9px; width:6px; height:6px; border-radius:50%; background:#ff3b30; border:1.5px solid #fff;"></div>
+        </div>
+        <div class="nav-icon-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#17191c" stroke-width="1.7"/>
+            <path d="M16.5 16.5L21 21" stroke="#17191c" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 캡슐 탭 -->
+    <div class="capsule-tabs">
+      <div class="cap-tab">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="6" r="4" stroke="#525661" stroke-width="1.4" fill="none"/>
+          <path d="M3 13C3 11 5.24 9.5 8 9.5s5 1.5 5 3.5" stroke="#525661" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+        탐색
+      </div>
+      <div class="cap-tab">추천</div>
+      <div class="cap-tab">이슈</div>
+      <div class="cap-tab active">라이브</div>
+    </div>
+
+    <!-- 텍스트 서브 탭 -->
+    <div class="text-tabs">
+      <div class="txt-tab active">전체</div>
+      <div class="txt-tab">게임</div>
+      <div class="txt-tab">보이는 라디오</div>
+      <div class="txt-tab">스포츠</div>
+    </div>
+
+    <!-- 스크롤 콘텐츠 -->
+    <div class="scroll-content">
+
+      <!-- 광고 배너 -->
+      <div class="section-banner">
+        <div class="ad-banner-card">
+          <div class="ad-banner-text">
+            <div class="ad-banner-title">Mercedes SL Roadster</div>
+            <div class="ad-banner-sub">스타는 다시 태어난다.</div>
+          </div>
+          <img
+            src="https://www.figma.com/api/mcp/asset/ab676b0f-3c80-489f-9bd7-7e440febfd01"
+            alt="Mercedes"
+            class="ad-banner-img"
+            onerror="this.style.display='none'"
+          />
+        </div>
+      </div>
+
+      <!-- 방송중 섹션 -->
+      <div class="section-list">
+        <div class="section-header">
+          <span class="section-title">방송중</span>
+        </div>
+        <div class="sort-row">
+          <span class="sort-label">참여자수(높은순)・한국어</span>
+          <svg class="sort-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="#757b8a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- 라이브 리스트 -->
+        <div class="live-list" id="liveList">
+          <!-- 아이템은 JS로 생성 -->
+        </div>
+      </div>
+
+    </div><!-- /.scroll-content -->
+
+    <!-- 하단 탭바 -->
+    <div class="bottom-tabbar">
+      <div class="tabbar-inner">
+        <!-- 홈 (선택됨) -->
+        <a class="tab-item active" href="home.html">
+          <div class="tab-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M3 10.5L12 3L21 10.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V10.5Z" fill="#525661"/>
+            </svg>
+          </div>
+          <span class="tab-label" style="color:#525661;">홈</span>
+        </a>
+        <!-- e스포츠 -->
+        <a class="tab-item" href="#">
+          <div class="tab-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="7" width="20" height="13" rx="3" stroke="#acb0b9" stroke-width="1.7" fill="none"/>
+              <path d="M8 13h3M9.5 11.5v3" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round"/>
+              <circle cx="15.5" cy="12" r="1" fill="#acb0b9"/>
+              <circle cx="15.5" cy="14" r="1" fill="#acb0b9"/>
+              <path d="M8 4l4-2 4 2" stroke="#acb0b9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <span class="tab-label">e스포츠</span>
+        </a>
+        <!-- Catch -->
+        <a class="tab-item" href="catch.html">
+          <div class="tab-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3C9 3 7 5 7 7.5C7 10 9 11.5 12 13C15 11.5 17 10 17 7.5C17 5 15 3 12 3Z" stroke="#acb0b9" stroke-width="1.7" fill="none"/>
+              <path d="M12 13V21" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M9 18L12 21L15 18" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="tab-label">Catch</span>
+        </a>
+        <!-- MY -->
+        <a class="tab-item" href="#">
+          <div class="tab-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="4" stroke="#acb0b9" stroke-width="1.7" fill="none"/>
+              <path d="M4 20C4 17 7.58 14 12 14C16.42 14 20 17 20 20" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <span class="tab-label">MY</span>
+        </a>
+        <!-- 더보기 -->
+        <a class="tab-item" href="#">
+          <div class="tab-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M4 6h16M4 12h16M4 18h16" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="tab-label">더보기</span>
+        </a>
+      </div>
+    </div>
+    <div class="safe-area"></div>
+
+  </div><!-- /.home-app -->
+  </div><!-- /.phone-screen -->
+</div><!-- /.phone-frame -->
+
+<button class="mockup-toggle is-on" id="mockupToggle">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="12" cy="18" r="1.5" fill="currentColor"/>
+  </svg>
+  <span>목업 ON</span>
+</button>
+
+<script>
+  /* ── 라이브 리스트 데이터 ── */
+  const LIVE_ITEMS = [
+    { nick: '닉네임여섯0', title: '[생]BJ흔한의 롤드컵 선발전 킹존:SB 5전 3선승제 5경기', viewers: '16,390', tags: ['한국어', '먹방', '먹방'] },
+    { nick: '수달사랑',   title: '수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다', viewers: '12,203', tags: ['한국어', '동물'] },
+    { nick: '항상#킴성태', title: '네모도 꿈이있는데! 여우는빚쟁이가됌;; 랜드마꾸! 일이삼사오육칠팔', viewers: '8,832', tags: ['보이는라디오', '먹방', '벚꽃엔딩'] },
+    { nick: 'SOOP공식',  title: '오늘 먹방 라이브! 최애 음식 리스트 공개합니다', viewers: '5,510', tags: ['한국어', '먹방'] },
+    { nick: '게임킹',    title: '리그오브레전드 랭크게임 다이아도전 3일차', viewers: '4,102', tags: ['게임', 'LOL'] },
+    { nick: '뷰티스타',  title: '오늘도 화이팅! 메이크업 튜토리얼 GRWM', viewers: '3,280', tags: ['뷰티', '일상'] },
+  ];
+
+  const list = document.getElementById('liveList');
+
+  LIVE_ITEMS.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'live-item';
+    el.innerHTML = `
+      <div class="thumb-wrap">
+        <img class="thumb-img" src="assets/content_live_view.jpg" alt="썸네일" onerror="this.src='assets/profile_bj.jpg'"/>
+        <div class="thumb-badge-left">
+          <div class="badge-live">
+            <div class="badge-live-dot"></div>
+            ${(Math.floor(Math.random()*900)+100)}
+          </div>
+          <div class="badge-sub-plus">
+            <span class="badge-sub-plus-text">구독</span>
+            <div class="badge-sub-plus-icon"></div>
+          </div>
+        </div>
+        <div class="badge-19">19</div>
+      </div>
+      <div class="live-info">
+        <div class="live-nick-row">
+          <img class="live-nick-profile" src="assets/profile_bj.jpg" alt="프로필"/>
+          <span class="live-nick">${item.nick}</span>
+          <div class="nick-badge-sub">S</div>
+          <div class="nick-badge-fan">F</div>
+        </div>
+        <div class="live-title">${item.title}</div>
+        <div class="live-tags">
+          <span class="live-tag dark">한국어</span>
+          ${item.tags.slice(1).map((t,i) => `<span class="live-tag ${i===0?'dark':'light'}">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="live-more-btn">
+        <div class="live-more-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+
+  /* ── Catch 탭 클릭 → catch.html ── */
+  document.querySelectorAll('a[href="catch.html"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      window.location.href = 'catch.html';
+    });
+  });
+
+  /* ── 목업 토글 ── */
+  const frame = document.getElementById('phoneFrame');
+  const toggleBtn = document.getElementById('mockupToggle');
+  const toggleSpan = toggleBtn.querySelector('span');
+  toggleBtn.addEventListener('click', () => {
+    const isOn = frame.classList.toggle('no-frame');
+    toggleBtn.classList.toggle('is-on', !isOn);
+    toggleSpan.textContent = isOn ? '목업 OFF' : '목업 ON';
+  });
+</script>
+</body>
+</html>

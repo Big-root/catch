@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>SOOP 캐치 플레이어</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-quaternary: #232529;
+      --label-primary: #fcfcfd;
+      --label-secondary: #d5d7dc;
+      --label-tertiary: #9196a1;
+      --label-quaternary: #757b8a;
+      --kr-primary: #0182ff;
+      --stroke-secondary: rgba(117,123,138,0.3);
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    /* ── 아이폰 목업 ── */
+    .phone-frame {
+      position: relative;
+      width: 399px;
+      height: 836px;
+      flex-shrink: 0;
+      transition: width 0.3s ease, height 0.3s ease;
+    }
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50px;
+      background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 40%, #222 100%);
+      box-shadow:
+        0 0 0 1px #3a3a3a,
+        0 0 0 2px #1a1a1a,
+        0 30px 80px rgba(0,0,0,0.9),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      z-index: 0;
+    }
+    .phone-screen {
+      position: absolute;
+      inset: 12px;
+      border-radius: 40px;
+      overflow: hidden;
+      z-index: 1;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      transition: inset 0.3s ease, border-radius 0.3s ease;
+    }
+    .btn-side-left {
+      position: absolute;
+      left: -3px; top: 120px;
+      width: 4px; height: 30px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: -1px 0 2px rgba(0,0,0,0.5);
+    }
+    .btn-side-left::before,
+    .btn-side-left::after {
+      content: '';
+      position: absolute;
+      left: 0; width: 4px; height: 58px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: -1px 0 2px rgba(0,0,0,0.5);
+    }
+    .btn-side-left::before { top: 46px; }
+    .btn-side-left::after  { top: 116px; }
+    .btn-side-right {
+      position: absolute;
+      right: -3px; top: 180px;
+      width: 4px; height: 74px;
+      background: #2a2a2a;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 1px 0 2px rgba(0,0,0,0.5);
+    }
+
+    /* ── 목업 OFF ── */
+    .phone-frame.no-frame { width: 375px; height: 812px; }
+    .phone-frame.no-frame::before { display: none; }
+    .phone-frame.no-frame .btn-side-left,
+    .phone-frame.no-frame .btn-side-right { display: none; }
+    .phone-frame.no-frame .phone-screen { inset: 0; border-radius: 12px; }
+
+    /* ── 목업 토글 버튼 ── */
+    .mockup-toggle {
+      position: fixed;
+      top: 16px; right: 16px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #2a2d33;
+      border: 1px solid #3a3e47;
+      color: #9196a1;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .mockup-toggle.is-on { background: #0e2a45; border-color: #0182ff; color: #0182ff; }
+
+    /* ── 앱 컨테이너 ── */
+    .catch-app {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── 플레이어 영역 (풀스크린) ── */
+    .catch-player {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* 비디오 스택 — 현재 + 다음 프리로드용 */
+    .catch-video-wrap {
+      position: absolute;
+      inset: 0;
+      will-change: transform;
+      touch-action: pan-x;
+    }
+    .catch-video-wrap video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 위/아래에 대기하는 다음 카드 */
+    .catch-next-card {
+      position: absolute;
+      left: 0; right: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      will-change: transform;
+      pointer-events: none;
+    }
+    .catch-next-card video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ── 딤 오버레이 ── */
+    .dim-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 100px;
+      background: linear-gradient(180deg,
+        rgba(0,0,0,0.40) 0%,
+        rgba(0,0,0,0.30) 20%,
+        rgba(0,0,0,0.20) 38%,
+        rgba(0,0,0,0.10) 57%,
+        rgba(0,0,0,0.08) 67%,
+        rgba(0,0,0,0.05) 76%,
+        rgba(0,0,0,0.03) 84%,
+        rgba(0,0,0,0.01) 93%,
+        rgba(0,0,0,0.00) 100%);
+      z-index: 5;
+      pointer-events: none;
+    }
+    .dim-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 200px;
+      background: linear-gradient(0deg,
+        rgba(0,0,0,0.70) 0%,
+        rgba(0,0,0,0.50) 20%,
+        rgba(0,0,0,0.30) 45%,
+        rgba(0,0,0,0.10) 70%,
+        rgba(0,0,0,0.00) 100%);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    /* ── 상태바 ── */
+    .status-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 59px;
+      z-index: 10;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding-top: 14px;
+      pointer-events: none;
+    }
+    .status-time {
+      padding-left: 20px;
+      font-size: 17px;
+      font-weight: 590;
+      color: #fff;
+      letter-spacing: -0.3px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    }
+    .status-icons {
+      padding-right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .status-icons svg { display: block; }
+
+    /* ── 상단 컨트롤 (VOD/LIVE + 아이콘) ── */
+    .top-controls {
+      position: absolute;
+      top: 59px; left: 0; right: 0;
+      height: 48px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .top-tab {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      position: absolute;
+      left: 50%;
+      transform: translateX(calc(-50% - 37.5px));
+    }
+    .top-tab-item {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--label-tertiary);
+      padding: 0 12px;
+      cursor: pointer;
+      line-height: 48px;
+      white-space: nowrap;
+    }
+    .top-tab-item.active { color: #fff; }
+
+    .top-right-btns {
+      position: absolute;
+      right: 6px;
+      top: 0;
+      display: flex;
+      align-items: center;
+    }
+    .icon-btn-48 {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .icon-btn-48 svg {
+      filter: drop-shadow(0px 0px 3px rgba(0,0,0,0.4));
+    }
+
+    /* ── 우측 액션 버튼 ── */
+    .right-actions {
+      position: absolute;
+      right: 6px;
+      bottom: 115px; /* 하단 정보 위 */
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .action-btn {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      filter: drop-shadow(0px 0px 3px rgba(0,0,0,0.4));
+    }
+    .action-btn svg { display: block; }
+    .action-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+      text-shadow: 0px 0px 6px rgba(0,0,0,0.4);
+      margin-top: -8px;
+      margin-bottom: 6px;
+      white-space: nowrap;
+    }
+
+    /* ── 하단 정보 ── */
+    .bottom-info {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 60px; /* 우측 버튼 영역 확보 */
+      z-index: 10;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .catch-title {
+      font-size: 16px;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .streamer-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .streamer-profile {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #333;
+    }
+    .streamer-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .viewer-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      height: 20px;
+      padding: 0 8px;
+      border: 1px solid var(--stroke-secondary);
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .viewer-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff2f00;
+      flex-shrink: 0;
+    }
+    .viewer-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--label-secondary);
+    }
+
+    /* ── 진행 바 ── */
+    .catch-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 16px;
+      z-index: 10;
+    }
+    .progress-track {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(246,246,249,0.3);
+    }
+    .progress-active {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 2px;
+      width: 12%;
+      background: #f1f2f4;
+      transition: width 0.1s linear;
+    }
+
+    /* ── 하단 탭바 ── */
+    .bottom-tabbar {
+      background: var(--bg-quaternary);
+      flex-shrink: 0;
+    }
+    .tabbar-inner {
+      display: flex;
+      align-items: stretch;
+    }
+    .tab-item {
+      flex: 1;
+      height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .tab-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .tab-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--label-quaternary);
+      position: absolute;
+      bottom: 7px;
+      white-space: nowrap;
+    }
+    .tab-item.active .tab-label { color: var(--label-secondary); }
+    .safe-area {
+      height: 34px;
+      background: var(--bg-quaternary);
+      flex-shrink: 0;
+    }
+
+    /* ── 스와이프 힌트 애니메이션 ── */
+    @keyframes swipeHint {
+      0%   { transform: translateY(0);    opacity: 1; }
+      50%  { transform: translateY(-18px); opacity: 0.4; }
+      100% { transform: translateY(0);    opacity: 1; }
+    }
+    .swipe-hint {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .swipe-hint.visible {
+      opacity: 1;
+      animation: swipeHint 1.5s ease-in-out 0.6s infinite;
+    }
+    .swipe-hint svg { filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)); }
+    .swipe-hint-text {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      text-shadow: 0 0 8px rgba(0,0,0,0.6);
+      white-space: nowrap;
+    }
+
+    /* ── 반응형 모바일 ── */
+    @media (max-width: 500px) {
+      body { padding: 0; background: #000; }
+      .phone-frame { width: 100vw; height: 100vh; background: none; }
+      .phone-frame::before { display: none; }
+      .phone-screen { inset: 0; border-radius: 0; }
+      .btn-side-left, .btn-side-right { display: none; }
+      .mockup-toggle { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="phone-frame" id="phoneFrame">
+  <div class="btn-side-left"></div>
+  <div class="btn-side-right"></div>
+  <div class="phone-screen">
+
+    <div class="catch-app" id="catchApp">
+
+      <!-- ① 플레이어 영역 -->
+      <div class="catch-player" id="catchPlayer">
+
+        <!-- 현재 영상 -->
+        <div class="catch-video-wrap" id="currentWrap">
+          <video id="currentVideo" autoplay muted loop playsinline></video>
+        </div>
+
+        <!-- 딤 -->
+        <div class="dim-top"></div>
+        <div class="dim-bottom"></div>
+
+        <!-- 상태바 -->
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <!-- 신호 -->
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+              <rect x="0" y="7" width="3" height="5" rx="1" fill="white"/>
+              <rect x="4.5" y="5" width="3" height="7" rx="1" fill="white"/>
+              <rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="white"/>
+              <rect x="13.5" y="0" width="3" height="12" rx="1" fill="white"/>
+            </svg>
+            <!-- 와이파이 -->
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+              <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5z" fill="white"/>
+              <path d="M1.5 5.5C3.26 3.74 5.51 2.75 8 2.75s4.74.99 6.5 2.75" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <path d="M4 7.5C5.15 6.35 6.5 5.75 8 5.75s2.85.6 4 1.75" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+            <!-- 배터리 -->
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+              <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/>
+              <rect x="2" y="2" width="18" height="8" rx="2" fill="white"/>
+              <path d="M23 4v4a2 2 0 0 0 0-4z" fill="white" fill-opacity="0.4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 상단 탭 (VOD / LIVE) + 우측 아이콘 -->
+        <div class="top-controls">
+          <div class="top-tab">
+            <span class="top-tab-item active">VOD</span>
+            <span class="top-tab-item">LIVE</span>
+          </div>
+          <div class="top-right-btns">
+            <!-- 리스트 아이콘 -->
+            <div class="icon-btn-48">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="6" width="18" height="2" rx="1" fill="white"/>
+                <rect x="3" y="11" width="18" height="2" rx="1" fill="white"/>
+                <rect x="3" y="16" width="12" height="2" rx="1" fill="white"/>
+              </svg>
+            </div>
+            <!-- 검색 아이콘 -->
+            <div class="icon-btn-48">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="7" stroke="white" stroke-width="1.8"/>
+                <path d="M16.5 16.5L21 21" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우측 액션 버튼 -->
+        <div class="right-actions" id="rightActions">
+          <!-- 좋아요 -->
+          <div class="action-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 4.5C12 4.5 12.5 2 15 2C17.5 2 19 4 19 6.5C19 9 17 11 14.5 13C14.5 13 14 13.5 12 15C10 13.5 9.5 13 9.5 13C7 11 5 9 5 6.5C5 4 6.5 2 9 2C11.5 2 12 4.5 12 4.5Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+              <path d="M12 20L8 17M12 20L16 17M12 20V15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="action-count" id="likeCount">8,888</div>
+
+          <!-- 선물 -->
+          <div class="action-btn" style="margin-top:8px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="10" width="18" height="12" rx="2" stroke="white" stroke-width="1.8"/>
+              <path d="M3 14h18M12 10v12" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M12 10c0 0-2-4 0-6s4 2 0 6z" stroke="white" stroke-width="1.8" fill="none"/>
+              <path d="M12 10c0 0 2-4 0-6s-4 2 0 6z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </div>
+
+          <!-- 애드벌룬 (AD) -->
+          <div class="action-btn" style="margin-top:8px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C8.13 2 5 5.13 5 9C5 12.5 7.5 15.4 10.8 15.9L10.3 18H13.7L13.2 15.9C16.5 15.4 19 12.5 19 9C19 5.13 15.87 2 12 2Z" stroke="white" stroke-width="1.8" fill="none"/>
+              <path d="M9 21h6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+              <text x="8.5" y="11" font-size="6" font-weight="700" font-family="Pretendard,sans-serif" fill="white">AD</text>
+            </svg>
+          </div>
+
+          <!-- 공유 -->
+          <div class="action-btn" style="margin-top:8px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="18" cy="5" r="2.5" stroke="white" stroke-width="1.7"/>
+              <circle cx="6" cy="12" r="2.5" stroke="white" stroke-width="1.7"/>
+              <circle cx="18" cy="19" r="2.5" stroke="white" stroke-width="1.7"/>
+              <path d="M8.3 10.7L15.7 6.3M8.3 13.3L15.7 17.7" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <!-- 더보기 -->
+          <div class="action-btn" style="margin-top:8px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="5" cy="12" r="2" fill="white"/>
+              <circle cx="12" cy="12" r="2" fill="white"/>
+              <circle cx="19" cy="12" r="2" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 하단 영상 정보 -->
+        <div class="bottom-info" id="bottomInfo">
+          <p class="catch-title" id="catchTitle">수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다.</p>
+          <div class="streamer-row">
+            <img class="streamer-profile" src="assets/profile_bj.jpg" alt="프로필" id="streamerProfile"/>
+            <span class="streamer-name" id="streamerName">수달사랑</span>
+            <div class="viewer-badge">
+              <div class="viewer-dot"></div>
+              <span class="viewer-count" id="viewerCount">16,390</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 진행 바 -->
+        <div class="catch-progress">
+          <div class="progress-track">
+            <div class="progress-active" id="progressBar"></div>
+          </div>
+        </div>
+
+        <!-- 스와이프 힌트 -->
+        <div class="swipe-hint" id="swipeHint">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 19V5M6 11l6-6 6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="swipe-hint-text">위로 스와이프해서 다음 영상</span>
+        </div>
+
+      </div><!-- /.catch-player -->
+
+      <!-- ② 하단 탭바 -->
+      <div class="bottom-tabbar">
+        <div class="tabbar-inner">
+          <!-- 홈 -->
+          <a class="tab-item" href="index.html">
+            <div class="tab-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 10.5L12 3L21 10.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V10.5Z" stroke="#757b8a" stroke-width="1.7" fill="none"/>
+              </svg>
+            </div>
+            <span class="tab-label">홈</span>
+          </a>
+          <!-- e스포츠 -->
+          <a class="tab-item" href="#">
+            <div class="tab-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="7" width="20" height="13" rx="3" stroke="#757b8a" stroke-width="1.7" fill="none"/>
+                <path d="M8 13h3M9.5 11.5v3" stroke="#757b8a" stroke-width="1.7" stroke-linecap="round"/>
+                <circle cx="15.5" cy="12" r="1" fill="#757b8a"/>
+                <circle cx="15.5" cy="14" r="1" fill="#757b8a"/>
+                <path d="M8 4l4-2 4 2" stroke="#757b8a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <span class="tab-label">e스포츠</span>
+          </a>
+          <!-- Catch (선택됨) -->
+          <a class="tab-item active" href="catch.html">
+            <div class="tab-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3C9 3 7 5 7 7.5C7 10 9 11.5 12 13C15 11.5 17 10 17 7.5C17 5 15 3 12 3Z" fill="#d5d7dc"/>
+                <path d="M12 13V21" stroke="#d5d7dc" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M9 18L12 21L15 18" stroke="#d5d7dc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="tab-label" style="color:#d5d7dc;">Catch</span>
+          </a>
+          <!-- MY -->
+          <a class="tab-item" href="#">
+            <div class="tab-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="4" stroke="#757b8a" stroke-width="1.7" fill="none"/>
+                <path d="M4 20C4 17 7.58 14 12 14C16.42 14 20 17 20 20" stroke="#757b8a" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <span class="tab-label">MY</span>
+          </a>
+          <!-- 더보기 -->
+          <a class="tab-item" href="#">
+            <div class="tab-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M4 6h16M4 12h16M4 18h16" stroke="#757b8a" stroke-width="1.7" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="tab-label">더보기</span>
+          </a>
+        </div>
+      </div>
+      <div class="safe-area"></div>
+
+    </div><!-- /.catch-app -->
+  </div><!-- /.phone-screen -->
+</div><!-- /.phone-frame -->
+
+<button class="mockup-toggle is-on" id="mockupToggle">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="12" cy="18" r="1.5" fill="currentColor"/>
+  </svg>
+  <span>목업 ON</span>
+</button>
+
+<script>
+  /* ── 영상 데이터 ── */
+  const VIDEOS = [
+    {
+      src: 'assets/세로영상1.mp4',
+      title: '수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다.',
+      streamer: '수달사랑',
+      profile: 'assets/profile_bj.jpg',
+      viewers: '16,390',
+      likes: '8,888',
+    },
+    {
+      src: 'assets/세로영상2.mp4',
+      title: '오늘 먹방 라이브! 최애 음식 리스트 공개합니다 🍜',
+      streamer: '항상#킴성태',
+      profile: 'assets/profile_bj.jpg',
+      viewers: '4,235',
+      likes: '3,214',
+    },
+    {
+      src: 'assets/가로영상1.mp4',
+      title: '네모도 꿈이있는데! 여우는빚쟁이가됌;; 랜드마꾸! 일이삼사오육칠팔',
+      streamer: 'SOOP 공식',
+      profile: 'assets/profile_sub.jpg',
+      viewers: '9,102',
+      likes: '5,502',
+    },
+  ];
+
+  let currentIdx = 0;
+  let isAnimating = false;
+
+  const playerEl    = document.getElementById('catchPlayer');
+  const currentWrap = document.getElementById('currentWrap');
+  const currentVideo= document.getElementById('currentVideo');
+
+  /* ── 영상 정보 UI 업데이트 ── */
+  function updateInfo(idx) {
+    const v = VIDEOS[idx];
+    document.getElementById('catchTitle').textContent    = v.title;
+    document.getElementById('streamerName').textContent  = v.streamer;
+    document.getElementById('streamerProfile').src       = v.profile;
+    document.getElementById('viewerCount').textContent   = v.viewers;
+    document.getElementById('likeCount').textContent     = v.likes;
+  }
+
+  /* ── 영상 로드 ── */
+  function loadVideo(el, src) {
+    el.src = src;
+    el.load();
+    el.play().catch(() => {});
+  }
+
+  loadVideo(currentVideo, VIDEOS[0].src);
+
+  /* ── 진행 바 업데이트 ── */
+  setInterval(() => {
+    const v = currentVideo;
+    if (v.duration) {
+      const pct = (v.currentTime / v.duration) * 100;
+      document.getElementById('progressBar').style.width = pct + '%';
+    }
+  }, 200);
+
+  /* ── 스와이프 제스처 ── */
+  let touchStartY = 0;
+  let touchCurrY  = 0;
+  let isDragging  = false;
+  let nextCard    = null;
+  let swipeDir    = 0; // 1=위(다음), -1=아래(이전)
+
+  const THRESHOLD = 60;
+  const PLAYER_H  = () => playerEl.clientHeight;
+
+  function createNextCard(idx) {
+    const card = document.createElement('div');
+    card.className = 'catch-next-card';
+    const vid = document.createElement('video');
+    vid.muted = true;
+    vid.loop  = true;
+    vid.setAttribute('playsinline', '');
+    card.appendChild(vid);
+    loadVideo(vid, VIDEOS[idx].src);
+    return card;
+  }
+
+  function onTouchStart(e) {
+    if (isAnimating) return;
+    touchStartY = e.touches[0].clientY;
+    touchCurrY  = touchStartY;
+    isDragging  = false;
+    swipeDir    = 0;
+  }
+
+  function onTouchMove(e) {
+    if (isAnimating) return;
+    touchCurrY = e.touches[0].clientY;
+    const dy = touchStartY - touchCurrY; // 위로 양수
+    const absDy = Math.abs(dy);
+
+    if (!isDragging && absDy > 8) {
+      isDragging = true;
+      swipeDir   = dy > 0 ? 1 : -1; // 1=다음, -1=이전
+
+      const nextIdx = (currentIdx + swipeDir + VIDEOS.length) % VIDEOS.length;
+      nextCard = createNextCard(nextIdx);
+
+      // 다음 카드 위치: 위로 스와이프면 아래에서 올라옴
+      nextCard.style.top = swipeDir > 0
+        ? PLAYER_H() + 'px'
+        : -PLAYER_H() + 'px';
+      playerEl.appendChild(nextCard);
+    }
+
+    if (!isDragging || !nextCard) return;
+    e.preventDefault();
+
+    const edy = dy * 0.85;
+    currentWrap.style.transform = `translateY(${-edy}px)`;
+    currentWrap.style.opacity   = Math.max(0, 1 - Math.abs(edy) / PLAYER_H());
+
+    const offset = swipeDir > 0
+      ? PLAYER_H() - edy
+      : -PLAYER_H() - edy;
+    nextCard.style.transform = `translateY(${offset}px)`;
+    nextCard.style.top = '0';
+  }
+
+  function onTouchEnd() {
+    if (!isDragging || isAnimating) {
+      isDragging = false;
+      return;
+    }
+    const dy = touchStartY - touchCurrY;
+    if (Math.abs(dy) > THRESHOLD) {
+      commitSwipe();
+    } else {
+      cancelSwipe();
+    }
+    isDragging = false;
+  }
+
+  function commitSwipe() {
+    isAnimating = true;
+    const dur = 280;
+    const easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
+
+    currentWrap.style.transition = `transform ${dur}ms ${easing}, opacity ${dur}ms ease`;
+    nextCard.style.transition    = `transform ${dur}ms ${easing}`;
+
+    currentWrap.style.transform  = `translateY(${swipeDir > 0 ? -PLAYER_H() : PLAYER_H()}px)`;
+    currentWrap.style.opacity    = '0';
+    nextCard.style.transform     = 'translateY(0px)';
+
+    setTimeout(() => {
+      currentIdx = (currentIdx + swipeDir + VIDEOS.length) % VIDEOS.length;
+
+      // 새 비디오를 currentVideo로 교체
+      const newVid = nextCard.querySelector('video');
+      currentWrap.innerHTML = '';
+      currentWrap.style.transform = '';
+      currentWrap.style.opacity   = '';
+      currentWrap.style.transition = '';
+
+      const clonedVid = document.createElement('video');
+      clonedVid.id = 'currentVideo';
+      clonedVid.muted = true;
+      clonedVid.loop  = true;
+      clonedVid.setAttribute('playsinline', '');
+      clonedVid.setAttribute('autoplay', '');
+      currentWrap.appendChild(clonedVid);
+      loadVideo(clonedVid, VIDEOS[currentIdx].src);
+
+      nextCard.remove();
+      nextCard = null;
+
+      updateInfo(currentIdx);
+      document.getElementById('progressBar').style.width = '0%';
+
+      isAnimating = false;
+      hideSwipeHint();
+    }, dur);
+  }
+
+  function cancelSwipe() {
+    isAnimating = true;
+    const dur = 220;
+    const easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
+
+    currentWrap.style.transition = `transform ${dur}ms ${easing}, opacity ${dur}ms ease`;
+    if (nextCard) nextCard.style.transition = `transform ${dur}ms ${easing}`;
+
+    currentWrap.style.transform = '';
+    currentWrap.style.opacity   = '';
+    if (nextCard) {
+      nextCard.style.transform = swipeDir > 0
+        ? `translateY(${PLAYER_H()}px)`
+        : `translateY(${-PLAYER_H()}px)`;
+    }
+
+    setTimeout(() => {
+      currentWrap.style.transition = '';
+      if (nextCard) { nextCard.remove(); nextCard = null; }
+      isAnimating = false;
+    }, dur);
+  }
+
+  playerEl.addEventListener('touchstart', onTouchStart, { passive: true });
+  playerEl.addEventListener('touchmove',  onTouchMove,  { passive: false });
+  playerEl.addEventListener('touchend',   onTouchEnd,   { passive: true });
+
+  /* 마우스 드래그 지원 (데스크탑 목업용) */
+  let mouseDown = false;
+  playerEl.addEventListener('mousedown', e => {
+    if (isAnimating) return;
+    mouseDown = true;
+    touchStartY = e.clientY;
+    touchCurrY  = e.clientY;
+    isDragging  = false;
+    swipeDir    = 0;
+  });
+  window.addEventListener('mousemove', e => {
+    if (!mouseDown) return;
+    touchCurrY = e.clientY;
+    const dy = touchStartY - touchCurrY;
+    const absDy = Math.abs(dy);
+
+    if (!isDragging && absDy > 8) {
+      isDragging = true;
+      swipeDir   = dy > 0 ? 1 : -1;
+      const nextIdx = (currentIdx + swipeDir + VIDEOS.length) % VIDEOS.length;
+      nextCard = createNextCard(nextIdx);
+      nextCard.style.top = swipeDir > 0 ? PLAYER_H() + 'px' : -PLAYER_H() + 'px';
+      playerEl.appendChild(nextCard);
+    }
+
+    if (!isDragging || !nextCard) return;
+    const edy = dy * 0.85;
+    currentWrap.style.transform = `translateY(${-edy}px)`;
+    currentWrap.style.opacity   = Math.max(0, 1 - Math.abs(edy) / PLAYER_H());
+    const offset = swipeDir > 0 ? PLAYER_H() - edy : -PLAYER_H() - edy;
+    nextCard.style.transform = `translateY(${offset}px)`;
+    nextCard.style.top = '0';
+  });
+  window.addEventListener('mouseup', () => {
+    if (!mouseDown) return;
+    mouseDown = false;
+    if (!isDragging || isAnimating) { isDragging = false; return; }
+    const dy = touchStartY - touchCurrY;
+    Math.abs(dy) > THRESHOLD ? commitSwipe() : cancelSwipe();
+    isDragging = false;
+  });
+
+  /* ── 스와이프 힌트 (첫 진입 시 3초간 표시) ── */
+  const swipeHintEl = document.getElementById('swipeHint');
+  let hintShown = false;
+  setTimeout(() => {
+    swipeHintEl.classList.add('visible');
+    hintShown = true;
+    setTimeout(() => swipeHintEl.classList.remove('visible'), 3500);
+  }, 1200);
+
+  function hideSwipeHint() {
+    swipeHintEl.classList.remove('visible');
+  }
+
+  /* ── 목업 토글 ── */
+  const frame   = document.getElementById('phoneFrame');
+  const toggleBtn = document.getElementById('mockupToggle');
+  const toggleSpan = toggleBtn.querySelector('span');
+  toggleBtn.addEventListener('click', () => {
+    const isOn = frame.classList.toggle('no-frame');
+    toggleBtn.classList.toggle('is-on', !isOn);
+    toggleSpan.textContent = isOn ? '목업 OFF' : '목업 ON';
+  });
+</script>
+</body>
+</html>
