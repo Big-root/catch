@@ -677,24 +677,31 @@
     el?.classList.add('active');
   }
 
+  function setTheme(dark) {
+    const color = dark ? '#000000' : '#ffffff';
+    document.getElementById('themeColor').content = color;
+    document.documentElement.style.backgroundColor = color;
+    document.body.style.backgroundColor = color;
+  }
+
   function openCatch() {
     catch2Overlay.style.transform = 'translateX(100%)';
     catchOverlay.style.transform = 'translateX(0)';
-    document.getElementById('themeColor').content = '#000000';
+    setTheme(true);
     setActiveTab(document.querySelector('a[href="catch.html"]'));
   }
 
   function openCatch2() {
     catchOverlay.style.transform = 'translateX(100%)';
     catch2Overlay.style.transform = 'translateX(0)';
-    document.getElementById('themeColor').content = '#000000';
+    setTheme(true);
     setActiveTab(document.getElementById('catch2TabBtn'));
   }
 
   function goHome() {
     catchOverlay.style.transform = 'translateX(100%)';
     catch2Overlay.style.transform = 'translateX(100%)';
-    document.getElementById('themeColor').content = '#ffffff';
+    setTheme(false);
     setActiveTab(document.querySelector('a[href="home.html"]'));
   }
 
