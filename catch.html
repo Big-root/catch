@@ -974,22 +974,15 @@
     setTimeout(() => {
       currentIdx = (currentIdx + swipeDir + VIDEOS.length) % VIDEOS.length;
 
-      // 새 비디오를 currentVideo로 교체
+      // nextCard의 이미 재생 중인 비디오를 그대로 currentWrap으로 이동 (재로드 없음)
       const newVid = nextCard.querySelector('video');
+      newVid.id = 'currentVideo';
       currentWrap.innerHTML = '';
       currentWrap.style.transform = '';
       currentWrap.style.opacity   = '';
       currentWrap.style.transition = '';
-
-      const clonedVid = document.createElement('video');
-      clonedVid.id = 'currentVideo';
-      clonedVid.muted = true;
-      clonedVid.loop  = true;
-      clonedVid.setAttribute('playsinline', '');
-      clonedVid.setAttribute('autoplay', '');
-      currentWrap.appendChild(clonedVid);
-      currentVideo = clonedVid;
-      loadVideo(clonedVid, VIDEOS[currentIdx].src);
+      currentWrap.appendChild(newVid);
+      currentVideo = newVid;
 
       nextCard.remove();
       nextCard = null;
