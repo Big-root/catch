@@ -219,17 +219,6 @@
     }
 
     /* ── 상태바 ── */
-    .status-bar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 59px;
-      z-index: 10;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding-top: 14px;
-      pointer-events: none;
-    }
     .status-time {
       padding-left: 20px;
       font-size: 17px;
@@ -249,7 +238,7 @@
     /* ── 상단 헤더 (catch2 전용) ── */
     .top-header {
       position: absolute;
-      top: 44px; left: 0; right: 0;
+      top: 0; left: 0; right: 0;
       height: 48px;
       z-index: 10;
       display: flex;
@@ -279,7 +268,7 @@
     /* ── 상단 탭 바 (pill 스타일, catch2 전용) ── */
     .top-controls {
       position: absolute;
-      top: 92px; left: 0; right: 0;
+      top: 48px; left: 0; right: 0;
       height: 44px;
       z-index: 10;
       display: flex;
@@ -575,32 +564,6 @@
         <!-- 딤 -->
         <div class="dim-top"></div>
         <div class="dim-bottom"></div>
-
-        <!-- 상태바 -->
-        <div class="status-bar">
-          <span class="status-time">9:41</span>
-          <div class="status-icons">
-            <!-- 신호 -->
-            <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
-              <rect x="0" y="7" width="3" height="5" rx="1" fill="white"/>
-              <rect x="4.5" y="5" width="3" height="7" rx="1" fill="white"/>
-              <rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="white"/>
-              <rect x="13.5" y="0" width="3" height="12" rx="1" fill="white"/>
-            </svg>
-            <!-- 와이파이 -->
-            <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
-              <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5z" fill="white"/>
-              <path d="M1.5 5.5C3.26 3.74 5.51 2.75 8 2.75s4.74.99 6.5 2.75" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-              <path d="M4 7.5C5.15 6.35 6.5 5.75 8 5.75s2.85.6 4 1.75" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            </svg>
-            <!-- 배터리 -->
-            <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
-              <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/>
-              <rect x="2" y="2" width="18" height="8" rx="2" fill="white"/>
-              <path d="M23 4v4a2 2 0 0 0 0-4z" fill="white" fill-opacity="0.4"/>
-            </svg>
-          </div>
-        </div>
 
         <!-- 헤더 -->
         <div class="top-header">
@@ -912,13 +875,13 @@
     topHeader.style.opacity   = '0';
     topHeader.style.transform = 'translateY(-12px)';
     topHeader.style.pointerEvents = 'none';
-    topControls.style.top     = '44px';
+    topControls.style.top     = '0px';
   }
   function expandHeader() {
     topHeader.style.opacity   = '';
     topHeader.style.transform = '';
     topHeader.style.pointerEvents = '';
-    topControls.style.top     = '92px';
+    topControls.style.top     = '48px';
   }
 
   function onTouchStart(e) {
