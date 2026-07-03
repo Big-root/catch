@@ -111,26 +111,25 @@
     /* ── 네비게이션 바 ── */
     .nav-bar {
       height: 44px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 8px; position: relative;
+      display: flex; align-items: center;
+      padding: 0 8px;
     }
-    .nav-logo {
-      font-size: 22px; font-weight: 900; color: #000;
-      letter-spacing: -1px;
-    }
-    .nav-logo span { color: var(--accent); }
     .nav-left {
-      position: absolute; left: 8px; top: 0;
-      display: flex; align-items: center; height: 44px;
+      flex: 1; display: flex; align-items: center;
+    }
+    .nav-center {
+      display: flex; align-items: center; justify-content: center;
     }
     .nav-right {
-      position: absolute; right: 8px; top: 0;
-      display: flex; align-items: center; height: 44px;
+      flex: 1; display: flex; align-items: center; justify-content: flex-end;
+    }
+    .nav-logo-img {
+      width: 80px; height: 27px; object-fit: contain; display: block;
     }
     .nav-icon-btn {
       width: 44px; height: 44px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
+      cursor: pointer; flex-shrink: 0;
     }
 
     /* ── 캡슐 탭 ── */
@@ -162,17 +161,17 @@
     /* ── 텍스트 탭 ── */
     .text-tabs {
       height: 44px; flex-shrink: 0;
-      display: flex; align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(145,150,161,0.1);
+      display: flex; align-items: center; justify-content: center;
+      gap: 4px;
     }
     .txt-tab {
-      flex: 1; height: 32px;
+      height: 32px;
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; font-weight: 400;
       color: var(--label-tertiary);
       cursor: pointer;
       white-space: nowrap;
+      padding: 0 12px;
     }
     .txt-tab.active {
       font-weight: 600;
@@ -457,36 +456,48 @@
 
     <!-- 네비게이션 바 -->
     <div class="nav-bar">
-      <!-- SOOP 로고 -->
-      <img src="https://www.figma.com/api/mcp/asset/4f28473c-225e-47b3-a83c-2db27d8edae9" alt="SOOP" style="height:27px; object-fit:contain;" onerror="this.style.display='none'; this.nextSibling.style.display='block'"/>
-      <span class="nav-logo" style="display:none;">S<span>OO</span>P</span>
-
       <!-- 왼쪽: 업로드 -->
       <div class="nav-left">
         <div class="nav-icon-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="3" width="18" height="18" rx="4" stroke="#17191c" stroke-width="1.7" fill="none"/>
-            <path d="M12 8v8M9 11l3-3 3 3" stroke="#17191c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <div style="position:relative; width:24px; height:24px;">
+            <img src="https://www.figma.com/api/mcp/asset/ad98fd42-7507-4212-b164-61b99840da79" style="position:absolute; inset:8.33% 8.33%; width:83.34%; height:83.34%; display:block;"/>
+          </div>
         </div>
       </div>
-
+      <!-- 가운데: SOOP 로고 -->
+      <div class="nav-center">
+        <svg width="92" height="44" viewBox="0 0 92 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.9595 25.8491C12.5414 26.4309 13.3 26.9613 14.2354 27.4391C15.1708 27.9179 16.2001 28.1563 17.3224 28.1563C17.5921 28.1563 17.8729 28.13 18.1638 28.0785C18.4547 28.027 18.7144 27.9381 18.9437 27.8138C19.1719 27.6896 19.3598 27.5229 19.5053 27.3148C19.6508 27.1067 19.7235 26.837 19.7235 26.5047C19.7235 25.9642 19.4477 25.5178 18.8972 25.1642C18.3467 24.8107 17.5406 24.4581 16.4809 24.1036L15.3274 23.7298C14.6829 23.5227 14.0334 23.252 13.3788 22.9197C12.7242 22.5873 12.1363 22.1873 11.6171 21.7196C11.0969 21.2519 10.6767 20.7014 10.3544 20.067C10.0322 19.4337 9.87158 18.6902 9.87158 17.8377C9.87158 16.8821 10.0473 15.9931 10.4019 15.1719C10.7544 14.3517 11.2696 13.6345 11.9454 13.0213C12.6202 12.4082 13.4576 11.9304 14.4546 11.5869C15.4526 11.2445 16.6062 11.0728 17.9153 11.0728C18.9336 11.0728 19.8588 11.1667 20.6902 11.3536C21.5215 11.5404 22.2488 11.7698 22.8731 12.0395C23.4964 12.3102 24.0267 12.6011 24.4631 12.9122C24.8994 13.2244 25.2318 13.5052 25.4601 13.7537L22.6539 17.3084C21.9266 16.7679 21.168 16.3265 20.3781 15.983C19.5881 15.6406 18.777 15.4689 17.9466 15.4689C17.6759 15.4689 17.4062 15.5002 17.1365 15.5628C16.8658 15.6255 16.6224 15.7184 16.4042 15.8436C16.186 15.9689 16.0092 16.1295 15.8738 16.3275C15.7385 16.5255 15.6708 16.7689 15.6708 17.0599C15.6708 17.372 15.7486 17.6417 15.9041 17.87C16.0597 18.0993 16.2728 18.2963 16.5436 18.4629C16.8133 18.6296 17.1406 18.7801 17.5254 18.9145C17.9103 19.0498 18.3204 19.1902 18.7568 19.3357L19.7538 19.6478C20.4599 19.8771 21.1771 20.1418 21.9054 20.4428C22.6327 20.7449 23.2873 21.1499 23.8691 21.659C24.4509 22.1681 24.9298 22.8025 25.3035 23.5611C25.6773 24.3208 25.8641 25.2501 25.8641 26.3511C25.8641 27.3077 25.6409 28.1906 25.1934 29.0007C24.7459 29.8109 24.1439 30.5079 23.3852 31.0897C22.6266 31.6715 21.7327 32.1241 20.7043 32.4463C19.676 32.7686 18.579 32.9292 17.4153 32.9292C15.3364 32.9292 13.596 32.6534 12.1929 32.1029C10.7898 31.5523 9.59985 30.8089 8.62305 29.8735L11.9595 25.8491Z" fill="#1A1C22"/>
+          <path d="M48.9117 19.7084C49.4503 19.3458 49.8338 18.9256 50.1419 18.5872C50.2163 18.5054 50.2866 18.4286 50.3528 18.3589C50.8159 17.871 51.2935 17.4639 51.7711 17.1477C52.717 16.5204 53.8045 16.1891 54.9148 16.1891C58.166 16.1891 60.8114 18.7741 60.8114 21.951C60.8114 25.1279 58.166 27.7128 54.9148 27.7128C53.6898 27.7128 52.4689 27.33 51.4785 26.634C51.0671 26.3451 50.6867 25.9774 50.2442 25.443C49.8338 24.946 48.584 23.4359 46.3934 23.4359C45.43 23.4359 44.543 23.7177 43.7584 24.2723C43.2094 24.6602 42.8145 25.1087 42.4961 25.4683C42.4021 25.5753 42.3121 25.6764 42.2304 25.7622C41.6629 26.3622 41.1791 26.7592 40.7098 27.0097C39.8507 27.4694 38.8738 27.7128 37.8855 27.7128C34.6343 27.7128 31.9889 25.1279 31.9889 21.951C31.9889 18.7741 34.6343 16.1891 37.8855 16.1891C39.0785 16.1891 40.2725 16.5538 41.2473 17.2164C41.7342 17.5478 42.1664 17.9427 42.4961 18.3589C42.9965 18.9892 44.1677 20.4661 46.3934 20.4661C47.3187 20.465 48.1653 20.2105 48.9117 19.7084ZM48.8311 12.9142C47.7394 13.6607 46.8938 14.488 46.5712 14.8214C46.4947 14.9002 46.3655 14.8971 46.2921 14.8143C45.7018 14.1466 45.0134 13.5425 44.238 13.0163C42.3938 11.7627 40.1391 11.0728 37.8866 11.0728C36.3845 11.0728 34.9269 11.3606 33.553 11.9283C32.2267 12.4768 31.0368 13.2607 30.0154 14.2587C28.9941 15.2568 28.1919 16.4194 27.6305 17.7154C27.0496 19.0579 26.7539 20.4832 26.7539 21.9499C26.7539 23.4177 27.0485 24.842 27.6305 26.1855C28.1908 27.4815 28.9941 28.6442 30.0154 29.6422C31.0368 30.6402 32.2267 31.4241 33.553 31.9726C34.9269 32.5403 36.3855 32.8282 37.8866 32.8282C39.7515 32.8282 41.5967 32.3675 43.2239 31.4978C44.2049 30.9735 45.1116 30.2543 46.075 29.2361C46.105 29.2048 46.1329 29.1735 46.1619 29.1432C46.2776 29.0179 46.4792 29.0189 46.5929 29.1452C47.1863 29.8048 47.7776 30.3341 48.4227 30.7867C50.2959 32.1029 52.6022 32.8282 54.9148 32.8282C56.4168 32.8282 57.8745 32.5403 59.2483 31.9726C60.5747 31.4251 61.7645 30.6402 62.7859 29.6422C63.8073 28.6442 64.6095 27.4815 65.1708 26.1855C65.7518 24.843 66.0464 23.4177 66.0464 21.9499C66.0464 20.4832 65.7518 19.0579 65.1708 17.7154C64.6095 16.4194 63.8073 15.2568 62.7859 14.2587C61.7645 13.2607 60.5747 12.4768 59.2483 11.9283C57.8745 11.3606 56.4168 11.0728 54.9148 11.0728C52.7521 11.0728 50.6308 11.6849 48.8311 12.9142Z" fill="url(#paint0_linear_64756_44621)"/>
+          <path d="M75.5223 21.1731C76.2708 21.1731 76.8627 20.9347 77.2991 20.4559C77.7355 19.9781 77.9537 19.365 77.9537 18.6164C77.9537 17.8265 77.7456 17.1931 77.3304 16.7143C76.9142 16.2365 76.3011 15.9971 75.491 15.9971H72.903V21.1731H75.5223ZM67.5088 11.6323H75.989C77.1112 11.6323 78.1244 11.7828 79.0285 12.0839C79.9325 12.3859 80.7063 12.8223 81.3508 13.393C81.9942 13.9647 82.4933 14.6819 82.8468 15.5446C83.2004 16.4073 83.3771 17.3992 83.3771 18.5215C83.3771 19.5821 83.1953 20.5428 82.8316 21.4054C82.468 22.2681 81.969 23.0065 81.3346 23.6187C80.7003 24.2318 79.9416 24.6995 79.0588 25.0217C78.1749 25.344 77.2042 25.5046 76.1435 25.5046H72.901V32.4261H67.5078V11.6323H67.5088Z" fill="#1A1C22"/>
+          <defs>
+            <linearGradient id="paint0_linear_64756_44621" x1="30.768" y1="10.0373" x2="62.7684" y2="35.5769" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#0082FF"/>
+              <stop offset="0.42" stop-color="#0A96FF"/>
+              <stop offset="0.56" stop-color="#05BCFF"/>
+              <stop offset="0.76" stop-color="#00F0FF"/>
+              <stop offset="0.79" stop-color="#04F0FC"/>
+              <stop offset="0.82" stop-color="#10F1F5"/>
+              <stop offset="0.85" stop-color="#24F4E8"/>
+              <stop offset="0.89" stop-color="#40F7D7"/>
+              <stop offset="0.92" stop-color="#64FBC1"/>
+              <stop offset="0.94" stop-color="#82FFB0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
       <!-- 오른쪽: 알림 + 검색 -->
       <div class="nav-right">
         <div class="nav-icon-btn" style="position:relative;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M4.5 10C4.5 6.41 7.41 3.5 11 3.5H13C16.59 3.5 19.5 6.41 19.5 10V16.5H4.5V10Z" stroke="#17191c" stroke-width="1.7" fill="none"/>
-            <path d="M3 16.5h18" stroke="#17191c" stroke-width="1.7" stroke-linecap="round"/>
-            <path d="M10 19.5a2 2 0 0 0 4 0" stroke="#17191c" stroke-width="1.7" fill="none"/>
-          </svg>
-          <!-- 알림 빨간 점 -->
-          <div style="position:absolute; top:10px; right:9px; width:6px; height:6px; border-radius:50%; background:#ff3b30; border:1.5px solid #fff;"></div>
+          <div style="position:relative; width:24px; height:24px;">
+            <img src="https://www.figma.com/api/mcp/asset/cadd419a-5e03-4849-95f8-4abfccc8a61e" style="position:absolute; inset:8.33% 12.5%; width:75%; height:79.17%; display:block;"/>
+            <img src="https://www.figma.com/api/mcp/asset/49e69b73-887b-416c-99b8-ab11499c8f0d" style="position:absolute; top:16.67%; left:62.5%; width:37.5%; height:37.5%; display:block;"/>
+          </div>
         </div>
         <div class="nav-icon-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="7" stroke="#17191c" stroke-width="1.7"/>
-            <path d="M16.5 16.5L21 21" stroke="#17191c" stroke-width="1.7" stroke-linecap="round"/>
-          </svg>
+          <div style="position:relative; width:24px; height:24px;">
+            <img src="https://www.figma.com/api/mcp/asset/8b52c019-7aa0-4060-bea1-98b841357ef5" style="position:absolute; inset:8.33% 8.34% 8.33% 8.33%; width:83.33%; height:83.34%; display:block;"/>
+          </div>
         </div>
       </div>
     </div>
@@ -494,10 +505,9 @@
     <!-- 캡슐 탭 -->
     <div class="capsule-tabs">
       <div class="cap-tab">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="6" r="4" stroke="#525661" stroke-width="1.4" fill="none"/>
-          <path d="M3 13C3 11 5.24 9.5 8 9.5s5 1.5 5 3.5" stroke="#525661" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-        </svg>
+        <div style="position:relative; width:16px; height:16px; flex-shrink:0;">
+          <img src="https://www.figma.com/api/mcp/asset/1fa935c2-29cd-4cc5-bec7-f54bafcac715" style="position:absolute; top:1px; left:1px; width:14px; height:14px; display:block;"/>
+        </div>
         탐색
       </div>
       <div class="cap-tab">추천</div>
@@ -558,8 +568,8 @@
         <!-- 홈 (선택됨) -->
         <a class="tab-item active" href="home.html">
           <div class="tab-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M3 10.5L12 3L21 10.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V10.5Z" fill="#525661"/>
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M17.6879 11.4117C19.0732 10.4305 20.9268 10.4305 22.3121 11.4117L27.3121 14.9533C28.3708 15.7033 29 16.9201 29 18.2174V24.9994C29 27.2086 27.2091 28.9994 25 28.9994H15C12.7909 28.9994 11 27.2086 11 24.9994V18.2174C11 16.9201 11.6292 15.7033 12.6879 14.9533L17.6879 11.4117ZM18 23C17.4477 23 17 23.4477 17 24C17 24.5523 17.4477 25 18 25H22C22.5523 25 23 24.5523 23 24C23 23.4477 22.5523 23 22 23H18Z" fill="#0182FF"/>
             </svg>
           </div>
           <span class="tab-label" style="color:#525661;">홈</span>
@@ -567,12 +577,8 @@
         <!-- e스포츠 -->
         <a class="tab-item" href="#">
           <div class="tab-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <rect x="2" y="7" width="20" height="13" rx="3" stroke="#acb0b9" stroke-width="1.7" fill="none"/>
-              <path d="M8 13h3M9.5 11.5v3" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round"/>
-              <circle cx="15.5" cy="12" r="1" fill="#acb0b9"/>
-              <circle cx="15.5" cy="14" r="1" fill="#acb0b9"/>
-              <path d="M8 4l4-2 4 2" stroke="#acb0b9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19.8376 10.0765C22.1895 10.0766 24.7344 10.569 26.24 10.9828C27.3316 11.2828 27.9722 12.284 27.9626 13.3197C27.9427 15.464 27.8464 17.5661 27.4363 19.2103C26.8394 21.603 25.3279 23.3807 23.864 24.5463C23.1289 25.1315 22.3872 25.5775 21.7429 25.8812C21.4982 25.9966 21.2459 26.1003 20.9998 26.184V28.0765H23.0437C23.596 28.0766 24.0437 28.5243 24.0437 29.0765C24.0437 29.6288 23.596 30.0765 23.0437 30.0765H16.9558C16.4037 30.0763 15.9558 29.6287 15.9558 29.0765C15.9558 28.5244 16.4037 28.0767 16.9558 28.0765H18.9998V26.1791C18.7518 26.0926 18.4989 25.9857 18.2546 25.8676C17.6144 25.5578 16.8789 25.1053 16.1501 24.516C14.6997 23.3432 13.2 21.5662 12.5984 19.2074C12.17 17.5274 12.0615 15.3873 12.0388 13.2103C12.0281 12.1832 12.6611 11.1809 13.7595 10.892C15.1942 10.5146 17.6176 10.0765 19.8376 10.0765ZM19.8376 12.0765C17.8341 12.0765 15.5867 12.4798 14.2683 12.8265C14.159 12.8553 14.0355 12.9682 14.0378 13.1898C14.0605 15.3622 14.1735 17.2883 14.5369 18.7133C15.0004 20.5308 16.1779 21.9657 17.408 22.9603C18.0194 23.4548 18.6253 23.8247 19.1257 24.0668C19.3761 24.1879 19.5901 24.2725 19.7566 24.3246C19.9051 24.371 19.9815 24.3811 19.9978 24.3832H20.0017C20.0157 24.3816 20.0956 24.3726 20.2537 24.3246C20.4222 24.2734 20.6385 24.1913 20.8904 24.0726C21.3942 23.8351 22.0036 23.4709 22.6179 22.9818C23.8531 21.9984 25.0354 20.5683 25.4949 18.726C25.8417 17.3355 25.9427 15.4482 25.9626 13.3011C25.9647 13.075 25.8361 12.9462 25.7107 12.9115C24.3193 12.5291 21.9586 12.0766 19.8376 12.0765ZM20.1111 13.4203C20.8657 13.4546 21.7493 13.5646 22.4626 13.6986C22.817 13.7652 23.1557 13.8429 23.4265 13.9281C23.5582 13.9695 23.7079 14.0233 23.8445 14.0931C23.9122 14.1278 24.0051 14.1803 24.0984 14.2562C24.1792 14.322 24.3447 14.4724 24.4402 14.723C24.5124 14.9127 24.514 15.0866 24.5144 15.141C24.5151 15.224 24.5096 15.3039 24.5027 15.3695C24.4887 15.5027 24.4628 15.6524 24.4334 15.8002C24.3737 16.0999 24.2842 16.4623 24.1824 16.8158C24.0811 17.1673 23.9606 17.5343 23.8376 17.8383C23.777 17.9882 23.7069 18.1459 23.6277 18.2855C23.5882 18.3552 23.5365 18.4376 23.4724 18.5189C23.4161 18.5903 23.3066 18.7181 23.1375 18.8197C22.9438 18.936 22.7373 18.9695 22.6804 18.9789C22.6783 18.9792 22.6763 18.9796 22.6746 18.9799C22.5779 18.9962 22.4734 19.0073 22.3748 19.015C22.1744 19.0307 21.9247 19.0396 21.656 19.0443C21.1147 19.0538 20.4333 19.0478 19.7732 19.0355C19.3417 19.0275 18.9149 19.0169 18.5359 19.0062C18.6866 19.2815 18.8531 19.532 19.0359 19.7474C19.0559 19.771 19.0748 19.7954 19.0925 19.8207C19.2568 20.0553 19.5817 20.2375 20.0593 20.2875C20.5433 20.3381 20.9993 20.229 21.2371 20.0931C21.7165 19.8192 22.3272 19.9859 22.6013 20.4652C22.8753 20.9447 22.7088 21.5555 22.2293 21.8295C21.57 22.2061 20.6806 22.3634 19.8513 22.2767C19.0287 22.1907 18.089 21.842 17.4832 21.0072C16.7172 20.0894 16.237 18.905 15.9421 17.8412C15.6407 16.7537 15.507 15.6973 15.4861 14.9867C15.4726 14.5266 15.775 14.1166 16.2185 13.9935L16.2273 13.9906L16.2488 13.9847C16.2671 13.9798 16.2936 13.973 16.3269 13.9642C16.3937 13.9467 16.4897 13.9221 16.6082 13.8929C16.8445 13.8349 17.1744 13.7577 17.5515 13.683C18.2836 13.5379 19.2784 13.3824 20.1111 13.4203ZM10.6541 15.1527C11.2063 15.1481 11.6581 15.5917 11.6628 16.1439C11.6673 16.6768 11.7331 17.4849 11.8484 18.2924C11.966 19.1156 12.1222 19.8463 12.28 20.2621C12.4758 20.7783 12.2162 21.3552 11.7 21.5511C11.1837 21.7471 10.606 21.4882 10.4099 20.972C10.1699 20.3398 9.99057 19.4266 9.8689 18.5746C9.745 17.7068 9.66828 16.8065 9.66284 16.1605C9.65838 15.6085 10.1021 15.1576 10.6541 15.1527ZM29.3455 15.1527C29.8976 15.1574 30.3411 15.6084 30.3367 16.1605C30.3312 16.8065 30.2555 17.7069 30.1316 18.5746C30.0099 19.4266 29.8296 20.3398 29.5896 20.972C29.3934 21.4881 28.8158 21.7471 28.2996 21.5511C27.7835 21.3551 27.5238 20.7782 27.7195 20.2621C27.8773 19.8463 28.0336 19.1156 28.1511 18.2924C28.2664 17.4849 28.3322 16.6768 28.3367 16.1439C28.3414 15.5917 28.7932 15.1481 29.3455 15.1527ZM20.0203 15.4183C19.4422 15.392 18.6462 15.5052 17.9412 15.6449C17.8042 15.672 17.6733 15.6994 17.5525 15.726C17.6008 16.1034 17.6757 16.5343 17.7849 16.9818C17.8626 16.9844 17.9475 16.9868 18.0378 16.9896C18.5177 17.0048 19.1604 17.0234 19.8113 17.0355C20.4641 17.0477 21.1163 17.0531 21.6209 17.0443C21.7667 17.0418 21.8959 17.0383 22.0056 17.0336C22.0876 16.8232 22.1774 16.5505 22.2605 16.2621C22.3138 16.0771 22.362 15.8939 22.4021 15.7269C22.3081 15.7063 22.2047 15.6853 22.0935 15.6644C21.4616 15.5457 20.6714 15.448 20.0203 15.4183Z" fill="#ACB0B9"/>
             </svg>
           </div>
           <span class="tab-label">e스포츠</span>
@@ -580,29 +586,26 @@
         <!-- Catch -->
         <a class="tab-item" href="catch.html">
           <div class="tab-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3C9 3 7 5 7 7.5C7 10 9 11.5 12 13C15 11.5 17 10 17 7.5C17 5 15 3 12 3Z" stroke="#acb0b9" stroke-width="1.7" fill="none"/>
-              <path d="M12 13V21" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round"/>
-              <path d="M9 18L12 21L15 18" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 16.5836C11.0003 11.7964 16.4325 8.98729 20.5293 11.4948L26.1074 14.9108C29.9641 17.2734 29.9643 22.726 26.1074 25.0885L20.5303 28.5035C16.4333 31.0114 11 28.2023 11 23.4147V16.5836ZM19.2139 13.0465C16.3937 11.573 13.0003 13.5772 13 16.5836V23.4147C13 26.5185 16.6164 28.5544 19.4854 26.7985L25.0625 23.3825C27.6456 21.8001 27.6457 18.1982 25.0625 16.6159L19.2139 13.0465ZM15.2959 20.0377C15.2961 16.8725 18.329 14.778 21.4238 15.9293C21.9414 16.1219 22.2052 16.6979 22.0127 17.2155C21.8201 17.7331 21.2442 17.9969 20.7266 17.8043C18.8906 17.1212 17.2961 18.3172 17.2959 20.0377C17.2959 20.9262 17.6989 21.5917 18.2949 21.9811C18.9003 22.3766 19.777 22.5304 20.7695 22.2116C21.2953 22.0427 21.8584 22.3323 22.0273 22.858C22.1962 23.3837 21.9073 23.9467 21.3818 24.1159C19.8734 24.6004 18.3596 24.4134 17.2002 23.6559C16.0315 22.8922 15.2959 21.5924 15.2959 20.0377Z" fill="#ACB0B9"/>
             </svg>
           </div>
           <span class="tab-label">Catch</span>
         </a>
-        <!-- MY -->
-        <a class="tab-item" href="#">
+        <!-- Catch2 -->
+        <a class="tab-item" href="#" id="catch2TabBtn">
           <div class="tab-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="4" stroke="#acb0b9" stroke-width="1.7" fill="none"/>
-              <path d="M4 20C4 17 7.58 14 12 14C16.42 14 20 17 20 20" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 16.5836C11.0003 11.7964 16.4325 8.98729 20.5293 11.4948L26.1074 14.9108C29.9641 17.2734 29.9643 22.726 26.1074 25.0885L20.5303 28.5035C16.4333 31.0114 11 28.2023 11 23.4147V16.5836ZM19.2139 13.0465C16.3937 11.573 13.0003 13.5772 13 16.5836V23.4147C13 26.5185 16.6164 28.5544 19.4854 26.7985L25.0625 23.3825C27.6456 21.8001 27.6457 18.1982 25.0625 16.6159L19.2139 13.0465ZM15.2959 20.0377C15.2961 16.8725 18.329 14.778 21.4238 15.9293C21.9414 16.1219 22.2052 16.6979 22.0127 17.2155C21.8201 17.7331 21.2442 17.9969 20.7266 17.8043C18.8906 17.1212 17.2961 18.3172 17.2959 20.0377C17.2959 20.9262 17.6989 21.5917 18.2949 21.9811C18.9003 22.3766 19.777 22.5304 20.7695 22.2116C21.2953 22.0427 21.8584 22.3323 22.0273 22.858C22.1962 23.3837 21.9073 23.9467 21.3818 24.1159C19.8734 24.6004 18.3596 24.4134 17.2002 23.6559C16.0315 22.8922 15.2959 21.5924 15.2959 20.0377Z" fill="#ACB0B9"/>
             </svg>
           </div>
-          <span class="tab-label">MY</span>
+          <span class="tab-label">Catch2</span>
         </a>
         <!-- 더보기 -->
         <a class="tab-item" href="#">
           <div class="tab-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M4 6h16M4 12h16M4 18h16" stroke="#acb0b9" stroke-width="1.7" stroke-linecap="round"/>
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M17 15.1425C17 13.4856 18.3431 12.1425 20 12.1425C21.6569 12.1425 23 13.4856 23 15.1425C23 16.7993 21.6569 18.1425 20 18.1425C18.3431 18.1425 17 16.7993 17 15.1425ZM23.5974 18.615C24.4658 17.7156 25 16.4914 25 15.1425C25 12.381 22.7614 10.1425 20 10.1425C17.2386 10.1425 15 12.381 15 15.1425C15 16.4914 15.5342 17.7156 16.4026 18.615C13.2535 19.7402 11 22.7496 11 26.2853C11 28.4156 12.7269 30.1425 14.8571 30.1425H25.1429C27.2731 30.1425 29 28.4156 29 26.2853C29 22.7496 26.7465 19.7402 23.5974 18.615ZM20 20.1425H19.1429C15.7503 20.1425 13 22.8927 13 26.2853C13 27.311 13.8315 28.1425 14.8571 28.1425H25.1429C26.1685 28.1425 27 27.311 27 26.2853C27 22.8927 24.2497 20.1425 20.8571 20.1425H20Z" fill="#ACB0B9"/>
             </svg>
           </div>
           <span class="tab-label">더보기</span>
@@ -676,12 +679,72 @@
     list.appendChild(el);
   });
 
-  /* ── Catch 탭 클릭 → catch.html ── */
+  /* ── Catch / Catch2 오버레이 ── */
+  const phoneScreen = document.querySelector('.phone-screen');
+  const overlayStyle = `
+    position: absolute; inset: 0; z-index: 100;
+    transform: translateX(100%);
+    transition: none;
+    background: #000;
+    border-radius: inherit;
+    overflow: hidden;
+  `;
+  const iframeStyle = 'width:100%; height:100%; border:none; display:block;';
+
+  const catchOverlay = document.createElement('div');
+  catchOverlay.id = 'catchOverlay';
+  catchOverlay.style.cssText = overlayStyle;
+  const catchIframe = document.createElement('iframe');
+  catchIframe.src = 'catch.html';
+  catchIframe.style.cssText = iframeStyle;
+  catchOverlay.appendChild(catchIframe);
+  phoneScreen.appendChild(catchOverlay);
+
+  const catch2Overlay = document.createElement('div');
+  catch2Overlay.id = 'catch2Overlay';
+  catch2Overlay.style.cssText = overlayStyle;
+  const catch2Iframe = document.createElement('iframe');
+  catch2Iframe.src = 'catch2.html';
+  catch2Iframe.style.cssText = iframeStyle;
+  catch2Overlay.appendChild(catch2Iframe);
+  phoneScreen.appendChild(catch2Overlay);
+
+  function setActiveTab(el) {
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    el?.classList.add('active');
+  }
+
+  function openCatch() {
+    catch2Overlay.style.transform = 'translateX(100%)';
+    catchOverlay.style.transform = 'translateX(0)';
+    setActiveTab(document.querySelector('a[href="catch.html"]'));
+  }
+
+  function openCatch2() {
+    catchOverlay.style.transform = 'translateX(100%)';
+    catch2Overlay.style.transform = 'translateX(0)';
+    setActiveTab(document.getElementById('catch2TabBtn'));
+  }
+
+  function goHome() {
+    catchOverlay.style.transform = 'translateX(100%)';
+    catch2Overlay.style.transform = 'translateX(100%)';
+    setActiveTab(document.querySelector('a[href="home.html"]'));
+  }
+
   document.querySelectorAll('a[href="catch.html"]').forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      window.location.href = 'catch.html';
-    });
+    a.addEventListener('click', e => { e.preventDefault(); openCatch(); });
+  });
+
+  document.getElementById('catch2TabBtn').addEventListener('click', e => {
+    e.preventDefault();
+    openCatch2();
+  });
+
+  window.addEventListener('message', e => {
+    if (e.data === 'go-home')   goHome();
+    if (e.data === 'go-catch')  openCatch();
+    if (e.data === 'go-catch2') openCatch2();
   });
 
   /* ── 목업 토글 ── */

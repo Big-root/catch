@@ -190,7 +190,7 @@
     .dim-top {
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 100px;
+      height: 150px;
       background: linear-gradient(180deg,
         rgba(0,0,0,0.40) 0%,
         rgba(0,0,0,0.30) 20%,
@@ -246,8 +246,8 @@
     }
     .status-icons svg { display: block; }
 
-    /* ── 상단 컨트롤 (VOD/LIVE + 아이콘) ── */
-    .top-controls {
+    /* ── 상단 헤더 (catch2 전용) ── */
+    .top-header {
       position: absolute;
       top: 44px; left: 0; right: 0;
       height: 48px;
@@ -255,24 +255,77 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .top-header-title {
+      font-size: 17px;
+      font-weight: 700;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+    .top-header-search {
+      position: absolute;
+      right: 6px;
+      top: 0;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* ── 상단 탭 바 (pill 스타일, catch2 전용) ── */
+    .top-controls {
+      position: absolute;
+      top: 92px; left: 0; right: 0;
+      height: 44px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      transition: top 0.22s ease;
     }
     .top-tab {
       display: flex;
       align-items: center;
-      gap: 0;
+      gap: 8px;
     }
     .top-tab-item {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--label-tertiary);
-      padding: 0 12px;
+      color: rgba(255,255,255,0.5);
+      padding: 0 16px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 17px;
+      border: 1.5px solid rgba(255,255,255,0.2);
       cursor: pointer;
-      line-height: 48px;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .top-tab-item.active {
+      color: #fff;
+      border-color: rgba(255,255,255,0.8);
+    }
+    .top-filter-btn {
+      position: absolute;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
       white-space: nowrap;
     }
-    .top-tab-item.active { color: #fff; }
-
     .top-right-btns {
       position: absolute;
       right: 6px;
@@ -325,75 +378,6 @@
     }
 
     /* ── 하단 정보 ── */
-    /* ── 채팅 오버레이 ── */
-    .chat-overlay {
-      display: none;
-      flex-direction: column;
-      gap: 0;
-      overflow: hidden;
-      margin-left: -10px;
-      margin-right: -40px;
-    }
-    .chat-overlay.visible { display: flex; }
-    .chat-msg {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 10px;
-      border-radius: 20px;
-      background: rgba(0,0,0,0.5);
-      margin-bottom: 2px;
-      width: fit-content;
-      max-width: 100%;
-      max-height: 48px;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                  transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      will-change: opacity, transform;
-    }
-    .chat-msg.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .chat-msg.hide {
-      display: none;
-    }
-    .chat-profile {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      object-fit: cover;
-      flex-shrink: 0;
-      background: #555;
-    }
-    .chat-badge {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 1px 4px;
-      border-radius: 3px;
-      flex-shrink: 0;
-      line-height: 14px;
-    }
-    .chat-badge.manager { background: #4CAF50; color: #fff; }
-    .chat-badge.fan     { background: #FF6B6B; color: #fff; }
-    .chat-badge.sub     { background: #7EBAFF; color: #000; }
-    .chat-name {
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .chat-text {
-      font-size: 13px;
-      font-weight: 400;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
     .bottom-info {
       position: absolute;
       bottom: 20px;
@@ -618,28 +602,30 @@
           </div>
         </div>
 
-        <!-- 상단 탭 (VOD / LIVE) + 우측 아이콘 -->
+        <!-- 헤더 -->
+        <div class="top-header">
+          <span class="top-header-title">Catch</span>
+          <div class="top-header-search">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="white" stroke-width="1.8"/>
+              <path d="M16.5 16.5L21 21" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- VOD / LIVE 탭 + 필터 -->
         <div class="top-controls">
           <div class="top-tab">
             <span class="top-tab-item active" id="tabVOD">VOD</span>
             <span class="top-tab-item" id="tabLIVE">LIVE</span>
           </div>
-          <div class="top-right-btns">
-            <!-- 리스트 아이콘 (필터, VOD 전용) -->
-            <div class="icon-btn-48 vod-only" id="filterBtn">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="6" width="18" height="2" rx="1" fill="white"/>
-                <rect x="3" y="11" width="18" height="2" rx="1" fill="white"/>
-                <rect x="3" y="16" width="12" height="2" rx="1" fill="white"/>
-              </svg>
-            </div>
-            <!-- 검색 아이콘 -->
-            <div class="icon-btn-48">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="7" stroke="white" stroke-width="1.8"/>
-                <path d="M16.5 16.5L21 21" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
+          <div class="top-filter-btn vod-only" id="filterBtn">
+            인기
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5l4 4 4-4" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="top-right-btns" style="display:none;">
           </div>
         </div>
 
@@ -688,25 +674,6 @@
             </svg>
           </div>
 
-          <!-- 채팅 (LIVE only) -->
-          <div class="action-btn live-only" id="chatBtn" style="margin-top:8px;">
-            <svg id="chatOffIcon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 12C30.63 12 36 17.37 36 24C36 30.63 30.63 36 24 36C21.93 36 19.99 35.48 18.29 34.55L13.04 35.96C12.45 36.12 11.9 35.57 12.06 34.98L13.46 29.74C12.53 28.03 12 26.08 12 23.99C12 17.37 17.37 12 24 12Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-              <path d="M18.5 25.5C19.3284 25.5 20 24.8284 20 24C20 23.1716 19.3284 22.5 18.5 22.5C17.6716 22.5 17 23.1716 17 24C17 24.8284 17.6716 25.5 18.5 25.5Z" fill="white"/>
-              <path d="M24 25.5C24.8284 25.5 25.5 24.8284 25.5 24C25.5 23.1716 24.8284 22.5 24 22.5C23.1716 22.5 22.5 23.1716 22.5 24C22.5 24.8284 23.1716 25.5 24 25.5Z" fill="white"/>
-              <path d="M29.5 25.5C30.3284 25.5 31 24.8284 31 24C31 23.1716 30.3284 22.5 29.5 22.5C28.6716 22.5 28 23.1716 28 24C28 24.8284 28.6716 25.5 29.5 25.5Z" fill="white"/>
-            </svg>
-            <svg id="chatOnIcon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
-              <path d="M24 12C30.63 12 36 17.37 36 24C36 30.63 30.63 36 24 36C21.93 36 19.99 35.48 18.29 34.55L13.04 35.96C12.45 36.12 11.9 35.57 12.06 34.98L13.46 29.74C12.53 28.03 12 26.08 12 23.99C12 17.37 17.37 12 24 12Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-              <path d="M18.5 25.5C19.3284 25.5 20 24.8284 20 24C20 23.1716 19.3284 22.5 18.5 22.5C17.6716 22.5 17 23.1716 17 24C17 24.8284 17.6716 25.5 18.5 25.5Z" fill="white"/>
-              <path d="M24 25.5C24.8284 25.5 25.5 24.8284 25.5 24C25.5 23.1716 24.8284 22.5 24 22.5C23.1716 22.5 22.5 23.1716 22.5 24C22.5 24.8284 23.1716 25.5 24 25.5Z" fill="white"/>
-              <path d="M29.5 25.5C30.3284 25.5 31 24.8284 31 24C31 23.1716 30.3284 22.5 29.5 22.5C28.6716 22.5 28 23.1716 28 24C28 24.8284 28.6716 25.5 29.5 25.5Z" fill="white"/>
-              <rect x="25" y="30" width="15.792" height="9.24496" rx="4.62248" fill="#7EBAFF"/>
-              <path d="M37.792 32.0705V37.1745H36.8755L34.6337 33.9316H34.5914V37.1745H33.534V32.0705H34.4646L36.6922 35.3133H36.7416V32.0705H37.792Z" fill="black"/>
-              <path d="M32.7726 34.6225C32.7726 36.2862 31.7363 37.245 30.3898 37.245C29.0293 37.245 28 36.2791 28 34.6225C28 32.9588 29.0293 32 30.3898 32C31.7363 32 32.7726 32.9588 32.7726 34.6225ZM31.694 34.6225C31.694 33.5298 31.1794 32.9376 30.3898 32.9376C29.6003 32.9376 29.0786 33.5298 29.0786 34.6225C29.0786 35.7152 29.6003 36.3073 30.3898 36.3073C31.1794 36.3073 31.694 35.7152 31.694 34.6225Z" fill="black"/>
-            </svg>
-          </div>
-
           <!-- 더보기 -->
           <div class="action-btn" style="margin-top:8px;">
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -720,8 +687,6 @@
 
         <!-- 하단 영상 정보 -->
         <div class="bottom-info" id="bottomInfo">
-          <!-- 채팅 오버레이 (LIVE + chat ON) -->
-          <div class="chat-overlay" id="chatOverlay"></div>
           <p class="catch-title" id="catchTitle">수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다.</p>
           <div class="streamer-row">
             <img class="streamer-profile" src="assets/profile_bj.jpg" alt="프로필" id="streamerProfile"/>
@@ -764,23 +729,23 @@
             </div>
             <span class="tab-label">e스포츠</span>
           </a>
-          <!-- Catch (선택됨) -->
-          <a class="tab-item active" href="catch.html">
-            <div class="tab-icon">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 16.5836C11.0003 11.7964 16.4325 8.98729 20.5293 11.4948L26.1074 14.9108C29.9641 17.2734 29.9643 22.726 26.1074 25.0885L20.5303 28.5035C16.4333 31.0114 11 28.2023 11 23.4147V16.5836ZM19.2139 13.0465C16.3937 11.573 13.0003 13.5772 13 16.5836V23.4147C13 26.5185 16.6164 28.5544 19.4854 26.7985L25.0625 23.3825C27.6456 21.8001 27.6457 18.1982 25.0625 16.6159L19.2139 13.0465ZM15.2959 20.0377C15.2961 16.8725 18.329 14.778 21.4238 15.9293C21.9414 16.1219 22.2052 16.6979 22.0127 17.2155C21.8201 17.7331 21.2442 17.9969 20.7266 17.8043C18.8906 17.1212 17.2961 18.3172 17.2959 20.0377C17.2959 20.9262 17.6989 21.5917 18.2949 21.9811C18.9003 22.3766 19.777 22.5304 20.7695 22.2116C21.2953 22.0427 21.8584 22.3323 22.0273 22.858C22.1962 23.3837 21.9073 23.9467 21.3818 24.1159C19.8734 24.6004 18.3596 24.4134 17.2002 23.6559C16.0315 22.8922 15.2959 21.5924 15.2959 20.0377Z" fill="#D5D7DC"/>
-              </svg>
-            </div>
-            <span class="tab-label" style="color:#d5d7dc;">Catch</span>
-          </a>
-          <!-- Catch2 -->
-          <a class="tab-item" href="#" id="catch2TabBtn">
+          <!-- Catch -->
+          <a class="tab-item" href="catch.html" id="catchTabBtn">
             <div class="tab-icon">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M11 16.5836C11.0003 11.7964 16.4325 8.98729 20.5293 11.4948L26.1074 14.9108C29.9641 17.2734 29.9643 22.726 26.1074 25.0885L20.5303 28.5035C16.4333 31.0114 11 28.2023 11 23.4147V16.5836ZM19.2139 13.0465C16.3937 11.573 13.0003 13.5772 13 16.5836V23.4147C13 26.5185 16.6164 28.5544 19.4854 26.7985L25.0625 23.3825C27.6456 21.8001 27.6457 18.1982 25.0625 16.6159L19.2139 13.0465ZM15.2959 20.0377C15.2961 16.8725 18.329 14.778 21.4238 15.9293C21.9414 16.1219 22.2052 16.6979 22.0127 17.2155C21.8201 17.7331 21.2442 17.9969 20.7266 17.8043C18.8906 17.1212 17.2961 18.3172 17.2959 20.0377C17.2959 20.9262 17.6989 21.5917 18.2949 21.9811C18.9003 22.3766 19.777 22.5304 20.7695 22.2116C21.2953 22.0427 21.8584 22.3323 22.0273 22.858C22.1962 23.3837 21.9073 23.9467 21.3818 24.1159C19.8734 24.6004 18.3596 24.4134 17.2002 23.6559C16.0315 22.8922 15.2959 21.5924 15.2959 20.0377Z" fill="#ACB0B9"/>
               </svg>
             </div>
-            <span class="tab-label">Catch2</span>
+            <span class="tab-label">Catch</span>
+          </a>
+          <!-- Catch2 (선택됨) -->
+          <a class="tab-item active" href="#" id="catch2TabBtn">
+            <div class="tab-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 16.5836C11.0003 11.7964 16.4325 8.98729 20.5293 11.4948L26.1074 14.9108C29.9641 17.2734 29.9643 22.726 26.1074 25.0885L20.5303 28.5035C16.4333 31.0114 11 28.2023 11 23.4147V16.5836ZM19.2139 13.0465C16.3937 11.573 13.0003 13.5772 13 16.5836V23.4147C13 26.5185 16.6164 28.5544 19.4854 26.7985L25.0625 23.3825C27.6456 21.8001 27.6457 18.1982 25.0625 16.6159L19.2139 13.0465ZM15.2959 20.0377C15.2961 16.8725 18.329 14.778 21.4238 15.9293C21.9414 16.1219 22.2052 16.6979 22.0127 17.2155C21.8201 17.7331 21.2442 17.9969 20.7266 17.8043C18.8906 17.1212 17.2961 18.3172 17.2959 20.0377C17.2959 20.9262 17.6989 21.5917 18.2949 21.9811C18.9003 22.3766 19.777 22.5304 20.7695 22.2116C21.2953 22.0427 21.8584 22.3323 22.0273 22.858C22.1962 23.3837 21.9073 23.9467 21.3818 24.1159C19.8734 24.6004 18.3596 24.4134 17.2002 23.6559C16.0315 22.8922 15.2959 21.5924 15.2959 20.0377Z" fill="#D5D7DC"/>
+              </svg>
+            </div>
+            <span class="tab-label" style="color:#d5d7dc;">Catch2</span>
           </a>
           <!-- 더보기 -->
           <a class="tab-item" href="#">
@@ -939,6 +904,23 @@
     return card;
   }
 
+  /* ── 헤더 접기/펴기 ── */
+  const topHeader   = document.querySelector('.top-header');
+  const topControls = document.querySelector('.top-controls');
+
+  function collapseHeader() {
+    topHeader.style.opacity   = '0';
+    topHeader.style.transform = 'translateY(-12px)';
+    topHeader.style.pointerEvents = 'none';
+    topControls.style.top     = '44px';
+  }
+  function expandHeader() {
+    topHeader.style.opacity   = '';
+    topHeader.style.transform = '';
+    topHeader.style.pointerEvents = '';
+    topControls.style.top     = '92px';
+  }
+
   function onTouchStart(e) {
     if (isAnimating) return;
     touchStartY = e.touches[0].clientY;
@@ -956,6 +938,9 @@
     if (!isDragging && absDy > 8) {
       isDragging = true;
       swipeDir   = dy > 0 ? 1 : -1; // 1=다음, -1=이전
+
+      if (swipeDir === 1) collapseHeader();
+      else expandHeader();
 
       const nextIdx = (currentIdx + swipeDir + VIDEOS.length) % VIDEOS.length;
       nextCard = createNextCard(nextIdx);
@@ -1041,6 +1026,7 @@
 
   function cancelSwipe() {
     isAnimating = true;
+    expandHeader();
     const dur = 220;
     const easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
@@ -1085,6 +1071,8 @@
     if (!isDragging && absDy > 8) {
       isDragging = true;
       swipeDir   = dy > 0 ? 1 : -1;
+      if (swipeDir === 1) collapseHeader();
+      else expandHeader();
       const nextIdx = (currentIdx + swipeDir + VIDEOS.length) % VIDEOS.length;
       nextCard = createNextCard(nextIdx);
       nextCard.style.top = swipeDir > 0 ? PLAYER_H() + 'px' : -PLAYER_H() + 'px';
@@ -1131,9 +1119,6 @@
     document.querySelectorAll('.vod-only').forEach(el => {
       el.style.display = isVOD ? '' : 'none';
     });
-    document.querySelectorAll('.live-only').forEach(el => {
-      el.style.display = isVOD ? 'none' : '';
-    });
   }
 
   setVODOnly(true);
@@ -1164,7 +1149,6 @@
     tabLIVE.classList.remove('active');
     viewerBadge.style.display = 'none';
     catchProgress.style.display = '';
-    if (chatOn) { chatOn = false; chatOffIcon.style.display = ''; chatOnIcon.style.display = 'none'; stopChat(); }
     setVODOnly(true);
     playerEl.classList.remove('live-mode');
     isLiveMode = false;
@@ -1186,85 +1170,6 @@
     loadVideo(currentVideo, VIDEOS[0].src);
     updateInfo(0);
     applyLiveStreamer();
-  });
-
-  /* ── 채팅 버튼 (LIVE only) ── */
-  const chatBtn     = document.getElementById('chatBtn');
-  const chatOffIcon = document.getElementById('chatOffIcon');
-  const chatOnIcon  = document.getElementById('chatOnIcon');
-  const chatOverlay = document.getElementById('chatOverlay');
-  let chatOn = false;
-  let chatInterval = null;
-
-  const CHAT_POOL = [
-    { name: '닉네임여섯자', nameColor: '#FFB347', badge: null,      profile: 'assets/profile_bj.jpg',  text: '안녕하세요 ㅋㅋㅋ' },
-    { name: '매니저닉네임', nameColor: '#4CAF50', badge: 'manager', profile: 'assets/profile_sub.jpg', text: '안녕하세요 ㅋㅋㅋ' },
-    { name: '열혈팬닉넴',   nameColor: '#FF6B6B', badge: 'fan',     profile: 'assets/profile_bj.jpg',  text: '연하게 해도 너무예쁜뎅 ㅋㅋㅋ' },
-    { name: '구독자닉넴',   nameColor: '#7EBAFF', badge: 'sub',     profile: 'assets/profile_sub.jpg', text: '오늘도 화이팅!! 🔥' },
-    { name: '시청자한명',   nameColor: '#fff',    badge: null,      profile: 'assets/profile_bj.jpg',  text: '와 진짜 맛있어보인다' },
-    { name: '팬이에요123',  nameColor: '#FFD700', badge: 'fan',     profile: 'assets/profile_sub.jpg', text: '최고야 ㅋㅋㅋ 매일 봄' },
-    { name: '뉴비시청자',   nameColor: '#fff',    badge: null,      profile: 'assets/profile_bj.jpg',  text: '처음 왔는데 너무 재밌다ㅋㅋ' },
-    { name: '단골팬닉네임', nameColor: '#FFB347', badge: 'fan',     profile: 'assets/profile_sub.jpg', text: '배고파지잖아요 ㅠㅠ' },
-  ];
-
-  function makeChatMsg(data) {
-    const el = document.createElement('div');
-    el.className = 'chat-msg';
-    let badgeHtml = '';
-    if (data.badge === 'manager') badgeHtml = '<span class="chat-badge manager">매</span>';
-    else if (data.badge === 'fan') badgeHtml = '<span class="chat-badge fan">열</span>';
-    else if (data.badge === 'sub') badgeHtml = '<span class="chat-badge sub">구</span>';
-    el.innerHTML = `
-      <img class="chat-profile" src="${data.profile}" />
-      ${badgeHtml}
-      <span class="chat-name" style="color:${data.nameColor}">${data.name}</span>
-      <span class="chat-text">${data.text}</span>
-    `;
-    return el;
-  }
-
-  let chatPoolIdx = 0;
-  function addChatMsg() {
-    const data = CHAT_POOL[chatPoolIdx % CHAT_POOL.length];
-    chatPoolIdx++;
-
-    const msgs = chatOverlay.querySelectorAll('.chat-msg');
-    if (msgs.length >= 3) {
-      const oldest = msgs[0];
-      oldest.remove();
-    }
-
-    const el = makeChatMsg(data);
-    chatOverlay.appendChild(el);
-    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
-  }
-
-  const catchTitle = document.getElementById('catchTitle');
-
-  function startChat() {
-    catchTitle.style.display = 'none';
-    chatOverlay.classList.add('visible');
-    chatOverlay.innerHTML = '';
-    chatPoolIdx = Math.floor(Math.random() * CHAT_POOL.length);
-    addChatMsg();
-    setTimeout(addChatMsg, 600);
-    setTimeout(addChatMsg, 1200);
-    chatInterval = setInterval(addChatMsg, 2200);
-  }
-
-  function stopChat() {
-    catchTitle.style.display = '';
-    chatOverlay.classList.remove('visible');
-    clearInterval(chatInterval);
-    chatInterval = null;
-    chatOverlay.innerHTML = '';
-  }
-
-  chatBtn.addEventListener('click', () => {
-    chatOn = !chatOn;
-    chatOffIcon.style.display = chatOn ? 'none' : '';
-    chatOnIcon.style.display  = chatOn ? '' : 'none';
-    chatOn ? startChat() : stopChat();
   });
 
   /* ── 필터 바텀 시트 ── */
@@ -1304,12 +1209,12 @@
     });
   }
 
-  const catch2TabBtn = document.getElementById('catch2TabBtn');
-  if (catch2TabBtn) {
-    catch2TabBtn.addEventListener('click', e => {
+  const catchTabBtn = document.getElementById('catchTabBtn');
+  if (catchTabBtn) {
+    catchTabBtn.addEventListener('click', e => {
       if (window.parent !== window) {
         e.preventDefault();
-        window.parent.postMessage('go-catch2', '*');
+        window.parent.postMessage('go-catch', '*');
       }
     });
   }
