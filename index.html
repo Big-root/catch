@@ -642,82 +642,14 @@
     list.appendChild(el);
   });
 
-  /* ── Catch / Catch2 오버레이 ── */
-  const phoneScreen = document.querySelector('.phone-screen');
-  const overlayStyle = `
-    position: absolute; inset: 0; z-index: 100;
-    transform: translateX(100%);
-    transition: none;
-    background: #000;
-    border-radius: inherit;
-    overflow: hidden;
-  `;
-  const iframeStyle = 'width:100%; height:100%; border:none; display:block;';
-
-  const catchOverlay = document.createElement('div');
-  catchOverlay.id = 'catchOverlay';
-  catchOverlay.style.cssText = overlayStyle;
-  const catchIframe = document.createElement('iframe');
-  catchIframe.src = 'catch.html';
-  catchIframe.style.cssText = iframeStyle;
-  catchOverlay.appendChild(catchIframe);
-  phoneScreen.appendChild(catchOverlay);
-
-  const catch2Overlay = document.createElement('div');
-  catch2Overlay.id = 'catch2Overlay';
-  catch2Overlay.style.cssText = overlayStyle;
-  const catch2Iframe = document.createElement('iframe');
-  catch2Iframe.src = 'catch2.html';
-  catch2Iframe.style.cssText = iframeStyle;
-  catch2Overlay.appendChild(catch2Iframe);
-  phoneScreen.appendChild(catch2Overlay);
-
-  function setActiveTab(el) {
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    el?.classList.add('active');
-  }
-
-  function setTheme(dark) {
-    const color = dark ? '#000000' : '#ffffff';
-    document.getElementById('themeColor').content = color;
-    document.documentElement.style.backgroundColor = color;
-    document.body.style.backgroundColor = color;
-  }
-
-  function openCatch() {
-    catch2Overlay.style.transform = 'translateX(100%)';
-    catchOverlay.style.transform = 'translateX(0)';
-    setTheme(true);
-    setActiveTab(document.querySelector('a[href="catch.html"]'));
-  }
-
-  function openCatch2() {
-    catchOverlay.style.transform = 'translateX(100%)';
-    catch2Overlay.style.transform = 'translateX(0)';
-    setTheme(true);
-    setActiveTab(document.getElementById('catch2TabBtn'));
-  }
-
-  function goHome() {
-    catchOverlay.style.transform = 'translateX(100%)';
-    catch2Overlay.style.transform = 'translateX(100%)';
-    setTheme(false);
-    setActiveTab(document.querySelector('a[href="home.html"]'));
-  }
-
+  /* ── Catch / Catch2 탭 이동 ── */
   document.querySelectorAll('a[href="catch.html"]').forEach(a => {
-    a.addEventListener('click', e => { e.preventDefault(); openCatch(); });
+    a.addEventListener('click', e => { e.preventDefault(); window.location.href = 'catch.html'; });
   });
 
   document.getElementById('catch2TabBtn').addEventListener('click', e => {
     e.preventDefault();
-    openCatch2();
-  });
-
-  window.addEventListener('message', e => {
-    if (e.data === 'go-home')   goHome();
-    if (e.data === 'go-catch')  openCatch();
-    if (e.data === 'go-catch2') openCatch2();
+    window.location.href = 'catch2.html';
   });
 
   /* ── 목업 토글 ── */

@@ -1261,20 +1261,16 @@
   const homeTabBtn = document.getElementById('homeTabBtn');
   if (homeTabBtn) {
     homeTabBtn.addEventListener('click', e => {
-      if (window.parent !== window) {
-        e.preventDefault();
-        window.parent.postMessage('go-home', '*');
-      }
+      e.preventDefault();
+      window.location.href = 'home.html';
     });
   }
 
   const catch2TabBtn = document.getElementById('catch2TabBtn');
   if (catch2TabBtn) {
     catch2TabBtn.addEventListener('click', e => {
-      if (window.parent !== window) {
-        e.preventDefault();
-        window.parent.postMessage('go-catch2', '*');
-      }
+      e.preventDefault();
+      window.location.href = 'catch2.html';
     });
   }
 </script>

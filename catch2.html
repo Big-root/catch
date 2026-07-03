@@ -1166,20 +1166,16 @@
   const homeTabBtn = document.getElementById('homeTabBtn');
   if (homeTabBtn) {
     homeTabBtn.addEventListener('click', e => {
-      if (window.parent !== window) {
-        e.preventDefault();
-        window.parent.postMessage('go-home', '*');
-      }
+      e.preventDefault();
+      window.location.href = 'home.html';
     });
   }
 
   const catchTabBtn = document.getElementById('catchTabBtn');
   if (catchTabBtn) {
     catchTabBtn.addEventListener('click', e => {
-      if (window.parent !== window) {
-        e.preventDefault();
-        window.parent.postMessage('go-catch', '*');
-      }
+      e.preventDefault();
+      window.location.href = 'catch.html';
     });
   }
 </script>
