@@ -1064,6 +1064,15 @@
       if (isLiveMode) applyLiveStreamer();
       document.getElementById('progressBar').style.width = '0%';
 
+      if (chatOn) {
+        clearInterval(chatTimer);
+        chatTimer = null;
+        chatOverlay.classList.remove('visible');
+        chatOverlay.innerHTML = '';
+        catchTitle.style.display = '';
+        setTimeout(() => { if (chatOn) startChat(); }, 2000);
+      }
+
       isAnimating = false;
       hideSwipeHint();
     }, dur);
@@ -1258,57 +1267,63 @@
 
   /* ── 채팅 ── */
   const CHAT_POOL = [
-    { name: '수달팬123', badge: '🎖️', text: '와 진짜 귀엽다ㅋㅋㅋ' },
-    { name: '럭키보이', badge: '⭐', text: '수달 존멋이야' },
-    { name: '항상응원해', badge: '💎', text: '오늘도 잘 봤어요!' },
-    { name: '소리나는잠', badge: '🎖️', text: '채팅 처음 해봄 ㅎㅎ' },
-    { name: 'SOOP팬', badge: '⭐', text: '방송 언제까지 해요?' },
-    { name: '새벽감성', badge: '💎', text: '수달이 진짜 귀엽네요 😍' },
-    { name: '풀밭위고양이', badge: '🎖️', text: '개재밌다 ㅋㅋㅋ' },
-    { name: '쪽빛하늘', badge: '⭐', text: '오늘 하이라이트 뭐예요?' },
-    { name: '리버티벨', badge: '💎', text: '구독 박았어요!' },
-    { name: '달빛소나타', badge: '🎖️', text: '첫방 기념 도네 갑니다~' },
+    { name: '닉네임여섯자', nameColor: '#FFB347', badge: null,      profile: 'assets/profile_bj.jpg',  text: '안녕하세요 ㅋㅋㅋ' },
+    { name: '매니저닉네임', nameColor: '#4CAF50', badge: 'manager', profile: 'assets/profile_sub.jpg', text: '안녕하세요 ㅋㅋㅋ' },
+    { name: '열혈팬닉넴',   nameColor: '#FF6B6B', badge: 'fan',     profile: 'assets/profile_bj.jpg',  text: '연하게 해도 너무예쁜뎅 ㅋㅋㅋ' },
+    { name: '구독자닉넴',   nameColor: '#7EBAFF', badge: 'sub',     profile: 'assets/profile_sub.jpg', text: '오늘도 화이팅!! 🔥' },
+    { name: '시청자한명',   nameColor: '#fff',    badge: null,      profile: 'assets/profile_bj.jpg',  text: '와 진짜 맛있어보인다' },
+    { name: '팬이에요123',  nameColor: '#FFD700', badge: 'fan',     profile: 'assets/profile_sub.jpg', text: '최고야 ㅋㅋㅋ 매일 봄' },
+    { name: '뉴비시청자',   nameColor: '#fff',    badge: null,      profile: 'assets/profile_bj.jpg',  text: '처음 왔는데 너무 재밌다ㅋㅋ' },
+    { name: '단골팬닉네임', nameColor: '#FFB347', badge: 'fan',     profile: 'assets/profile_sub.jpg', text: '배고파지잖아요 ㅠㅠ' },
   ];
-  function makeChatMsg(item) {
+
+  function makeChatMsg(data) {
     const el = document.createElement('div');
     el.className = 'chat-msg';
-    el.innerHTML = `<span class="chat-badge">${item.badge}</span><span class="chat-name">${item.name}</span><span class="chat-text">${item.text}</span>`;
+    let badgeHtml = '';
+    if (data.badge === 'manager') badgeHtml = '<span class="chat-badge manager">매</span>';
+    else if (data.badge === 'fan') badgeHtml = '<span class="chat-badge fan">열</span>';
+    else if (data.badge === 'sub') badgeHtml = '<span class="chat-badge sub">구</span>';
+    el.innerHTML = `
+      <img class="chat-profile" src="${data.profile}" />
+      ${badgeHtml}
+      <span class="chat-name" style="color:${data.nameColor}">${data.name}</span>
+      <span class="chat-text">${data.text}</span>
+    `;
     return el;
   }
 
+  let chatPoolIdx = 0;
   function addChatMsg() {
-    if (!chatOn) return;
+    const data = CHAT_POOL[chatPoolIdx % CHAT_POOL.length];
+    chatPoolIdx++;
     const msgs = chatOverlay.querySelectorAll('.chat-msg');
-    if (msgs.length >= 3) {
-      const oldest = msgs[0];
-      oldest.classList.add('hide');
-      oldest.remove();
-    }
-    const item = chatPool.shift();
-    chatPool.push(item);
-    const el = makeChatMsg(item);
+    if (msgs.length >= 3) msgs[0].remove();
+    const el = makeChatMsg(data);
     chatOverlay.appendChild(el);
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
-    chatTimer = setTimeout(addChatMsg, 1800 + Math.random() * 1200);
   }
 
+  const catchTitle = document.getElementById('catchTitle');
+
   function startChat() {
-    chatPool = [...CHAT_POOL].sort(() => Math.random() - 0.5);
-    chatOverlay.innerHTML = '';
+    catchTitle.style.display = 'none';
     chatOverlay.classList.add('visible');
-    const catchTitle = document.getElementById('catchTitle');
-    if (catchTitle) catchTitle.style.display = 'none';
+    chatOverlay.innerHTML = '';
+    chatPoolIdx = Math.floor(Math.random() * CHAT_POOL.length);
     addChatMsg();
+    setTimeout(addChatMsg, 600);
+    setTimeout(addChatMsg, 1200);
+    chatTimer = setInterval(addChatMsg, 2200);
   }
 
   function stopChat() {
     chatOn = false;
-    clearTimeout(chatTimer);
+    clearInterval(chatTimer);
     chatTimer = null;
     chatOverlay.classList.remove('visible');
     chatOverlay.innerHTML = '';
-    const catchTitle = document.getElementById('catchTitle');
-    if (catchTitle) catchTitle.style.display = '';
+    catchTitle.style.display = '';
     if (chatOffIcon) { chatOffIcon.style.display = ''; chatOnIcon.style.display = 'none'; }
   }
 

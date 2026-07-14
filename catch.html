@@ -991,6 +991,15 @@
       if (isLiveMode) applyLiveStreamer();
       document.getElementById('progressBar').style.width = '0%';
 
+      if (chatOn) {
+        clearInterval(chatInterval);
+        chatInterval = null;
+        chatOverlay.classList.remove('visible');
+        chatOverlay.innerHTML = '';
+        catchTitle.style.display = '';
+        setTimeout(() => { if (chatOn) startChat(); }, 2000);
+      }
+
       isAnimating = false;
       hideSwipeHint();
     }, dur);
