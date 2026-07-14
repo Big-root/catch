@@ -825,6 +825,15 @@
 </button>
 
 <script>
+  /* ── 채팅 상태 (setVODOnly보다 먼저 선언) ── */
+  let chatOn = false;
+  let chatTimer = null;
+  let chatPool = [];
+  const chatOverlay = document.getElementById('chatOverlay');
+  const chatOffIcon = document.getElementById('chatOffIcon');
+  const chatOnIcon  = document.getElementById('chatOnIcon');
+  const chatBtn     = document.getElementById('chatBtn');
+
   /* ── 영상 데이터 ── */
   const VOD_VIDEOS = [
     {
@@ -1259,14 +1268,6 @@
     { name: '리버티벨', badge: '💎', text: '구독 박았어요!' },
     { name: '달빛소나타', badge: '🎖️', text: '첫방 기념 도네 갑니다~' },
   ];
-  let chatOn = false;
-  let chatTimer = null;
-  let chatPool = [];
-  const chatOverlay = document.getElementById('chatOverlay');
-  const chatOffIcon = document.getElementById('chatOffIcon');
-  const chatOnIcon  = document.getElementById('chatOnIcon');
-  const chatBtn     = document.getElementById('chatBtn');
-
   function makeChatMsg(item) {
     const el = document.createElement('div');
     el.className = 'chat-msg';
