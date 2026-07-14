@@ -1157,7 +1157,7 @@
     document.querySelectorAll('.live-only').forEach(el => {
       el.style.display = isVOD ? 'none' : '';
     });
-    if (isVOD) stopChat();
+    if (isVOD && typeof stopChat === 'function') stopChat();
   }
 
   setVODOnly(true);
