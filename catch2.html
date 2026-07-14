@@ -830,10 +830,12 @@
   let chatOn = false;
   let chatTimer = null;
   let chatPool = [];
+  let chatPoolIdx = 0;
   const chatOverlay = document.getElementById('chatOverlay');
   const chatOffIcon = document.getElementById('chatOffIcon');
   const chatOnIcon  = document.getElementById('chatOnIcon');
   const chatBtn     = document.getElementById('chatBtn');
+  const catchTitle  = document.getElementById('catchTitle');
 
   /* ── 영상 데이터 ── */
   const VOD_VIDEOS = [
@@ -1293,7 +1295,6 @@
     return el;
   }
 
-  let chatPoolIdx = 0;
   function addChatMsg() {
     const data = CHAT_POOL[chatPoolIdx % CHAT_POOL.length];
     chatPoolIdx++;
@@ -1303,8 +1304,6 @@
     chatOverlay.appendChild(el);
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
   }
-
-  const catchTitle = document.getElementById('catchTitle');
 
   function startChat() {
     catchTitle.style.display = 'none';
