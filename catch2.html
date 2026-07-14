@@ -367,6 +367,58 @@
       white-space: nowrap;
     }
 
+    /* ── 채팅 오버레이 ── */
+    .chat-overlay {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+      margin-left: -10px;
+      margin-right: -40px;
+    }
+    .chat-overlay.visible { display: flex; }
+    .chat-msg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.5);
+      margin-bottom: 2px;
+      width: fit-content;
+      max-width: 100%;
+      max-height: 48px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: opacity, transform;
+    }
+    .chat-msg.show { opacity: 1; transform: translateY(0); }
+    .chat-msg.hide { display: none; }
+    .chat-profile {
+      width: 22px; height: 22px;
+      border-radius: 50%; object-fit: cover;
+      flex-shrink: 0; background: #555;
+    }
+    .chat-badge {
+      font-size: 10px; font-weight: 700;
+      padding: 1px 4px; border-radius: 3px;
+      flex-shrink: 0; line-height: 14px;
+    }
+    .chat-badge.manager { background: #4CAF50; color: #fff; }
+    .chat-badge.fan     { background: #FF6B6B; color: #fff; }
+    .chat-badge.sub     { background: #7EBAFF; color: #000; }
+    .chat-name {
+      font-size: 13px; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .chat-text {
+      font-size: 13px; font-weight: 400; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
     /* ── 하단 정보 ── */
     .bottom-info {
       position: absolute;
@@ -638,6 +690,24 @@
             </svg>
           </div>
 
+          <!-- 채팅 -->
+          <div class="action-btn live-only" id="chatBtn" style="margin-top:8px;">
+            <svg id="chatOffIcon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g filter="url(#fc1)">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M24 12C17.3726 12 12 17.3726 12 24C12 26.3851 12.6874 28.6114 13.8735 30.4832L12.0762 35.4635C11.8664 36.0532 12.4352 36.6127 13.0213 36.3923L17.8944 34.5649C19.7101 35.6932 21.7799 36.3598 24 36.3598C30.6274 36.3598 36 30.9872 36 24.3598C36 17.7324 30.6274 12 24 12ZM19.5 23.25C19.5 22.4216 20.1716 21.75 21 21.75C21.8284 21.75 22.5 22.4216 22.5 23.25C22.5 24.0784 21.8284 24.75 21 24.75C20.1716 24.75 19.5 24.0784 19.5 23.25ZM24 21.75C23.1716 21.75 22.5 22.4216 22.5 23.25H22.5001C22.5001 24.0784 23.1716 24.75 24.0001 24.75C24.8285 24.75 25.5001 24.0784 25.5001 23.25C25.5001 22.4216 24.8285 21.75 24 21.75ZM25.5 23.25C25.5 22.4216 26.1716 21.75 27 21.75C27.8284 21.75 28.5 22.4216 28.5 23.25C28.5 24.0784 27.8284 24.75 27 24.75C26.1716 24.75 25.5 24.0784 25.5 23.25Z" fill="white"/>
+              </g>
+              <defs><filter id="fc1" x="-6" y="-6" width="60" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter></defs>
+            </svg>
+            <svg id="chatOnIcon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+              <g filter="url(#fc2)">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M24 12C17.3726 12 12 17.3726 12 24C12 26.3851 12.6874 28.6114 13.8735 30.4832L12.0762 35.4635C11.8664 36.0532 12.4352 36.6127 13.0213 36.3923L17.8944 34.5649C19.7101 35.6932 21.7799 36.3598 24 36.3598C30.6274 36.3598 36 30.9872 36 24.3598C36 17.7324 30.6274 12 24 12ZM19.5 23.25C19.5 22.4216 20.1716 21.75 21 21.75C21.8284 21.75 22.5 22.4216 22.5 23.25C22.5 24.0784 21.8284 24.75 21 24.75C20.1716 24.75 19.5 24.0784 19.5 23.25ZM24 21.75C23.1716 21.75 22.5 22.4216 22.5 23.25H22.5001C22.5001 24.0784 23.1716 24.75 24.0001 24.75C24.8285 24.75 25.5001 24.0784 25.5001 23.25C25.5001 22.4216 24.8285 21.75 24 21.75ZM25.5 23.25C25.5 22.4216 26.1716 21.75 27 21.75C27.8284 21.75 28.5 22.4216 28.5 23.25C28.5 24.0784 27.8284 24.75 27 24.75C26.1716 24.75 25.5 24.0784 25.5 23.25Z" fill="white"/>
+              </g>
+              <circle cx="36" cy="14" r="7" fill="#4A90E2"/>
+              <text x="36" y="18" text-anchor="middle" font-size="9" font-weight="bold" fill="white">ON</text>
+              <defs><filter id="fc2" x="-6" y="-6" width="60" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter></defs>
+            </svg>
+          </div>
+
           <!-- 더보기 -->
           <div class="action-btn" style="margin-top:8px;">
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -651,6 +721,7 @@
 
         <!-- 하단 영상 정보 -->
         <div class="bottom-info" id="bottomInfo">
+          <div class="chat-overlay" id="chatOverlay"></div>
           <p class="catch-title" id="catchTitle">수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다.</p>
           <div class="streamer-row">
             <img class="streamer-profile" src="assets/profile_bj.jpg" alt="프로필" id="streamerProfile"/>
@@ -1083,6 +1154,10 @@
     document.querySelectorAll('.vod-only').forEach(el => {
       el.style.display = isVOD ? '' : 'none';
     });
+    document.querySelectorAll('.live-only').forEach(el => {
+      el.style.display = isVOD ? 'none' : '';
+    });
+    if (isVOD) stopChat();
   }
 
   setVODOnly(true);
@@ -1168,6 +1243,83 @@
     homeTabBtn.addEventListener('click', e => {
       e.preventDefault();
       window.location.href = 'home.html';
+    });
+  }
+
+  /* ── 채팅 ── */
+  const CHAT_POOL = [
+    { name: '수달팬123', badge: '🎖️', text: '와 진짜 귀엽다ㅋㅋㅋ' },
+    { name: '럭키보이', badge: '⭐', text: '수달 존멋이야' },
+    { name: '항상응원해', badge: '💎', text: '오늘도 잘 봤어요!' },
+    { name: '소리나는잠', badge: '🎖️', text: '채팅 처음 해봄 ㅎㅎ' },
+    { name: 'SOOP팬', badge: '⭐', text: '방송 언제까지 해요?' },
+    { name: '새벽감성', badge: '💎', text: '수달이 진짜 귀엽네요 😍' },
+    { name: '풀밭위고양이', badge: '🎖️', text: '개재밌다 ㅋㅋㅋ' },
+    { name: '쪽빛하늘', badge: '⭐', text: '오늘 하이라이트 뭐예요?' },
+    { name: '리버티벨', badge: '💎', text: '구독 박았어요!' },
+    { name: '달빛소나타', badge: '🎖️', text: '첫방 기념 도네 갑니다~' },
+  ];
+  let chatOn = false;
+  let chatTimer = null;
+  let chatPool = [];
+  const chatOverlay = document.getElementById('chatOverlay');
+  const chatOffIcon = document.getElementById('chatOffIcon');
+  const chatOnIcon  = document.getElementById('chatOnIcon');
+  const chatBtn     = document.getElementById('chatBtn');
+
+  function makeChatMsg(item) {
+    const el = document.createElement('div');
+    el.className = 'chat-msg';
+    el.innerHTML = `<span class="chat-badge">${item.badge}</span><span class="chat-name">${item.name}</span><span class="chat-text">${item.text}</span>`;
+    return el;
+  }
+
+  function addChatMsg() {
+    if (!chatOn) return;
+    const msgs = chatOverlay.querySelectorAll('.chat-msg');
+    if (msgs.length >= 3) {
+      const oldest = msgs[0];
+      oldest.classList.add('hide');
+      oldest.remove();
+    }
+    const item = chatPool.shift();
+    chatPool.push(item);
+    const el = makeChatMsg(item);
+    chatOverlay.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+    chatTimer = setTimeout(addChatMsg, 1800 + Math.random() * 1200);
+  }
+
+  function startChat() {
+    chatPool = [...CHAT_POOL].sort(() => Math.random() - 0.5);
+    chatOverlay.innerHTML = '';
+    chatOverlay.classList.add('visible');
+    const catchTitle = document.getElementById('catchTitle');
+    if (catchTitle) catchTitle.style.display = 'none';
+    addChatMsg();
+  }
+
+  function stopChat() {
+    chatOn = false;
+    clearTimeout(chatTimer);
+    chatTimer = null;
+    chatOverlay.classList.remove('visible');
+    chatOverlay.innerHTML = '';
+    const catchTitle = document.getElementById('catchTitle');
+    if (catchTitle) catchTitle.style.display = '';
+    if (chatOffIcon) { chatOffIcon.style.display = ''; chatOnIcon.style.display = 'none'; }
+  }
+
+  if (chatBtn) {
+    chatBtn.addEventListener('click', () => {
+      chatOn = !chatOn;
+      if (chatOn) {
+        chatOffIcon.style.display = 'none';
+        chatOnIcon.style.display = '';
+        startChat();
+      } else {
+        stopChat();
+      }
     });
   }
 
