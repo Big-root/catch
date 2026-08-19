@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soop-live-v2';
+const CACHE_NAME = 'soop-live-v3';
 const STATIC_ASSETS = [
   './home.html',
   './live.html',
@@ -28,14 +28,14 @@ self.addEventListener('fetch', (e) => {
   // 동영상은 캐싱 제외 (용량 과다)
   if (e.request.url.includes('.mp4')) return;
 
+  // 네트워크 우선 — 새 파일이 항상 먼저 반영되고, 오프라인일 때만 캐시로 대체
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      return cached || fetch(e.request).then((res) => {
-        if (!res || res.status !== 200 || res.type === 'opaque') return res;
+    fetch(e.request).then((res) => {
+      if (res && res.status === 200 && res.type !== 'opaque') {
         const clone = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-        return res;
-      });
-    })
+      }
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });

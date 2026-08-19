@@ -534,6 +534,80 @@
       background: var(--ctn-bg-dark);
     }
 
+    /* 광고 자세히보기 — 아래에서 위로 슬라이드 업 */
+    .ad-detail-sheet {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 262px; /* Figma 63962:77140 실측값 */
+      border-radius: 20px 20px 0 0;
+      z-index: 20;
+      background: transparent;
+      overflow: hidden;
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+      pointer-events: none;
+    }
+    .ad-detail-sheet.open {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .ad-detail-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .ad-detail-close {
+      position: absolute;
+      top: 32px; right: 8px;
+      width: 30px; height: 30px;
+      cursor: pointer;
+    }
+    .ad-detail-close .close-bg { position: absolute; inset: 0; width: 30px; height: 30px; display: block; }
+    .ad-detail-close .close-x {
+      position: absolute; top: 50%; left: 50%;
+      width: 12px; height: 12px;
+      transform: translate(-50%, -50%);
+      display: block;
+    }
+    .ad-detail-info {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 92px;
+      background: rgba(23,25,28,0.5);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+    }
+    .ad-detail-text {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 122px;
+      display: flex; flex-direction: column; gap: 4px; min-width: 0;
+    }
+    .ad-detail-title {
+      font-size: 15px; font-weight: 600; color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ad-detail-sub { font-size: 12px; font-weight: 400; color: rgba(252,252,253,0.6); white-space: nowrap; }
+    .ad-detail-cta {
+      position: absolute;
+      top: 21px; right: 16px;
+      height: 34px;
+      min-width: 58px;
+      padding: 0 16px;
+      border-radius: 17px;
+      background: var(--kr-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px; font-weight: 600; color: #fff;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
     /* 채팅/광고 숨김 (채팅 토글) */
     .live-app.chat-hidden .chat-section { display: none; }
 
@@ -678,6 +752,22 @@
         </div>
       </div>
       <div class="ad-safe-area"></div>
+
+      <!-- 광고 자세히보기 (아래에서 위로 슬라이드) -->
+      <div class="ad-detail-sheet" id="adDetailSheet">
+        <img class="ad-detail-bg" src="assets/live-icons/ad-detail-bg.png" alt="" />
+        <div class="ad-detail-close" id="adDetailClose">
+          <img class="close-bg" src="assets/live-icons/icon-ad-close-bg.svg" alt="" />
+          <img class="close-x" src="assets/live-icons/icon-ad-close-x.svg" alt="" />
+        </div>
+        <div class="ad-detail-info">
+          <div class="ad-detail-text">
+            <p class="ad-detail-title">닥터 스트레인지: 대혼돈의 멀티버스</p>
+            <p class="ad-detail-sub">8월 20일 ~ 9월 20일까지</p>
+          </div>
+          <div class="ad-detail-cta">구매하기</div>
+        </div>
+      </div>
 
     </div><!-- /.live-app -->
   </div><!-- /.phone-screen -->
@@ -974,6 +1064,15 @@
   /* ── 공지 배너 클릭 시 살짝 숨김 처리 (닫기 흉내) ── */
   document.getElementById('noticePill').addEventListener('click', function () {
     this.style.display = 'none';
+  });
+
+  /* ── 광고 자세히보기 (아래에서 위로 슬라이드) ── */
+  const adDetailSheet = document.getElementById('adDetailSheet');
+  document.getElementById('adBanner').addEventListener('click', () => {
+    adDetailSheet.classList.add('open');
+  });
+  document.getElementById('adDetailClose').addEventListener('click', () => {
+    adDetailSheet.classList.remove('open');
   });
 
   /* ── 목업 토글 ── */
