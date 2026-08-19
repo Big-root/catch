@@ -199,25 +199,6 @@
       pointer-events: none;
     }
 
-    /* 상태바 (불투명 검정, 비디오 위가 아니라 별도 영역) */
-    .status-bar {
-      height: 44px;
-      flex-shrink: 0;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px 0 24px;
-      transition: opacity 0.25s ease;
-    }
-    .status-time {
-      font-size: 15px;
-      font-weight: 590;
-      color: #fff;
-      letter-spacing: -0.2px;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-    }
-    .status-levels { height: 12px; display: block; }
 
     /* 실제 재생 화면 (비디오는 배경 레이어이므로 여긴 오버레이만 담당) */
     .screen {
@@ -574,11 +555,6 @@
 
       <!-- ① 비디오 영역 -->
       <div class="video-section">
-        <div class="status-bar">
-          <span class="status-time">9:41</span>
-          <img class="status-levels" src="assets/live-icons/statusbar-levels-v2.svg" alt="" />
-        </div>
-
         <div class="screen">
           <div class="screen-overlay">
             <!-- 상단 버튼 -->
@@ -785,12 +761,11 @@
   }
 
   function getChatMaxHeight() {
-    const appH      = liveApp.getBoundingClientRect().height;
-    const statusBarH = document.querySelector('.status-bar').getBoundingClientRect().height;
+    const appH       = liveApp.getBoundingClientRect().height;
     const adBannerH  = document.getElementById('adBanner').getBoundingClientRect().height;
     const adSafeH    = document.querySelector('.ad-safe-area').getBoundingClientRect().height;
     const minVideoVisible = 120; /* 비디오 최소 노출 영역 확보 */
-    const spaceBasedMax = appH - statusBarH - adBannerH - adSafeH - minVideoVisible;
+    const spaceBasedMax = appH - adBannerH - adSafeH - minVideoVisible;
     return Math.max(CHAT_MIN_H, Math.min(getSixLineChatHeight(), spaceBasedMax));
   }
 
