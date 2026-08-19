@@ -1,12 +1,11 @@
-const CACHE_NAME = 'soop-live-v1';
+const CACHE_NAME = 'soop-live-v2';
 const STATIC_ASSETS = [
-  '/soop-live-player/',
-  '/soop-live-player/index.html',
-  '/soop-live-player/manifest.json',
-  '/soop-live-player/assets/icon-192.png',
-  '/soop-live-player/assets/icon-512.png',
-  '/soop-live-player/assets/profile_bj.jpg',
-  '/soop-live-player/assets/ad_thumb.jpg',
+  './home.html',
+  './live.html',
+  './manifest.json',
+  './assets/icon-192.png',
+  './assets/icon-512.png',
+  './assets/profile_bj.jpg',
 ];
 
 self.addEventListener('install', (e) => {
