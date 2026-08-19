@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame" clip-path="url(#clip0_0_45378)">
+<path id="Union" d="M16 0C18.2523 0 20 1.74772 20 4V14C20 16.2523 18.2523 18 16 18H4C1.74772 18 0 16.2523 0 14V4C0 1.74772 1.74772 0 4 0H16ZM4 2C2.85228 2 2 2.85228 2 4V14C2 15.1477 2.85228 16 4 16H16C17.1477 16 18 15.1477 18 14V4C18 2.85228 17.1477 2 16 2H4ZM15.1006 3.2998C15.9003 3.30009 16.6004 4.00007 16.6006 4.7998V13.2998C16.6006 14.0996 15.9004 14.7995 15.1006 14.7998H13.1006C12.3006 14.7998 11.6006 14.0998 11.6006 13.2998V4.7998C11.6007 3.99991 12.3007 3.2998 13.1006 3.2998H15.1006Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_0_45378">
+<rect width="20" height="18" fill="white"/>
+</clipPath>
+</defs>
+</svg>

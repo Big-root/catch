@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
+  <title>SOOP 라이브 플레이어</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --label-primary: #fcfcfd;
+      --label-secondary: #d5d7dc;
+      --label-tertiary: #757b8a;
+      --stroke-secondary: rgba(117,123,138,0.3);
+      --kr-primary: #0182ff;
+      --ctn-bg-dark: #232529;
+      --label-tertiary-dark: #9196a1;
+      --ctn-bg-light-mid-alpha10: rgba(246,246,249,0.1);
+      --grey-light-alpha20: rgba(246,246,249,0.2);
+      --grey-light-alpha30: rgba(246,246,249,0.3);
+      --tag-bg-strong: rgba(145,150,161,0.2);
+      --tag-bg-weak: rgba(145,150,161,0.1);
+
+      /* 채팅 뱃지/닉네임 색상 (SOOP 디자인 토큰) */
+      --chat-100: #ff6600; /* BJ */
+      --chat-200: #53b1ae; /* 매니저 */
+      --chat-300: #e09135; /* 구독자 */
+      --chat-400: #d65b8f; /* 열혈팬 */
+      --chat-500: #75aa5c; /* 팬클럽 */
+      --chat-600: #489ed7; /* 운영자 안내(파랑) */
+      --chat-700: #e7494f; /* 운영자 안내(빨강) */
+      --chat-800: #63a4e7; /* 시스템 메시지 */
+      --chat-900: #9379bd; /* 서포터 */
+      --chat-default: #819aaa; /* 일반 참여자 */
+      --chat-text: #d5d7dc; /* 채팅 본문 */
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    /* ── 아이폰 목업 ── */
+    .phone-frame {
+      position: relative;
+      width: 399px;
+      height: 836px;
+      flex-shrink: 0;
+      transition: width 0.3s ease, height 0.3s ease;
+    }
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50px;
+      background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 40%, #222 100%);
+      box-shadow:
+        0 0 0 1px #3a3a3a,
+        0 0 0 2px #1a1a1a,
+        0 30px 80px rgba(0,0,0,0.9),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      z-index: 0;
+    }
+    .phone-screen {
+      position: absolute;
+      inset: 12px;
+      border-radius: 40px;
+      overflow: hidden;
+      z-index: 1;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      transition: inset 0.3s ease, border-radius 0.3s ease;
+    }
+    .btn-side-left {
+      position: absolute;
+      left: -3px; top: 120px;
+      width: 4px; height: 30px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: -1px 0 2px rgba(0,0,0,0.5);
+    }
+    .btn-side-left::before,
+    .btn-side-left::after {
+      content: '';
+      position: absolute;
+      left: 0; width: 4px; height: 58px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: -1px 0 2px rgba(0,0,0,0.5);
+    }
+    .btn-side-left::before { top: 46px; }
+    .btn-side-left::after  { top: 116px; }
+    .btn-side-right {
+      position: absolute;
+      right: -3px; top: 180px;
+      width: 4px; height: 74px;
+      background: #2a2a2a;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 1px 0 2px rgba(0,0,0,0.5);
+    }
+
+    .phone-frame.no-frame { width: 375px; height: 812px; }
+    .phone-frame.no-frame::before { display: none; }
+    .phone-frame.no-frame .btn-side-left,
+    .phone-frame.no-frame .btn-side-right { display: none; }
+    .phone-frame.no-frame .phone-screen { inset: 0; border-radius: 12px; }
+
+    .mockup-toggle {
+      position: fixed;
+      top: 16px; right: 16px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #2a2d33;
+      border: 1px solid #3a3e47;
+      color: #9196a1;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .mockup-toggle.is-on { background: #0e2a45; border-color: #0182ff; color: #0182ff; }
+
+    /* ── 앱 컨테이너 ── */
+    .live-app {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* 배경 비디오 — 앱 전체 높이를 채우고, 채팅/광고 영역까지 이어져 보인다 */
+    .bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    /* 딤 2장 — 라이브 플레이어 가이드 기준(전체 852 캔버스 대비 %) */
+    /* 상단 딤: 0 ~ 348px → 0 ~ 40.85% */
+    .dim-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 40.85%;
+      background: linear-gradient(180deg, rgba(0,0,0,0.4) 19.467%, rgba(0,0,0,0) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* 하단 딤: 409 ~ 852px → 48% ~ 100% (채팅 입력 영역까지 내려가서 그 지점부터 위로 올라옴) */
+    .dim-bottom {
+      position: absolute;
+      top: 55%; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 19.467%, rgba(0,0,0,0.8) 100%);
+      z-index: 1;
+      pointer-events: none;
+      transform-origin: bottom;
+      transition: transform 0.2s ease;
+    }
+
+    /* ══════════════ ① 비디오 영역 ══════════════ */
+    .video-section {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+      transition: opacity 0.25s ease;
+    }
+
+    /* 3초 자동 숨김 — 채팅 영역과 상태바는 제외, 상단/하단 버튼·방송정보·상단 딤만 숨김 */
+    /* video-section 자체는 탭 감지를 위해 계속 클릭 가능한 상태로 두고, 안쪽 컨트롤만 숨김+비활성화 */
+    .dim-top { transition: opacity 0.25s ease; }
+    .live-app.controls-hidden .dim-top { opacity: 0; }
+    .live-app.controls-hidden .screen-overlay {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* 상태바 (불투명 검정, 비디오 위가 아니라 별도 영역) */
+    .status-bar {
+      height: 44px;
+      flex-shrink: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px 0 24px;
+      transition: opacity 0.25s ease;
+    }
+    .status-time {
+      font-size: 15px;
+      font-weight: 590;
+      color: #fff;
+      letter-spacing: -0.2px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    }
+    .status-levels { height: 12px; display: block; }
+
+    /* 실제 재생 화면 (비디오는 배경 레이어이므로 여긴 오버레이만 담당) */
+    .screen {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: opacity 0.25s ease;
+    }
+
+    /* 상단 버튼 줄 */
+    .top-buttons {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 6px;
+    }
+    .icon-btn-38 {
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .icon-btn-38 img { max-width: 24px; max-height: 24px; width: auto; height: auto; display: block; }
+    .top-right-icons { display: flex; align-items: center; gap: 5px; }
+    #moreBtn img { transform: rotate(90deg); }
+
+    /* 정보 오버레이 (제목/태그/BJ) */
+    .info-overlay-wrap { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+    .live-info-overlay {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .live-info-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--label-primary);
+      line-height: normal;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .live-info-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+    .tag-chip {
+      height: 20px;
+      padding: 0 8px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 400;
+      color: var(--label-secondary);
+      white-space: nowrap;
+    }
+    .tag-chip.strong { background: var(--tag-bg-strong); }
+    .tag-chip.weak   { background: var(--tag-bg-weak); }
+
+    .live-info-bjrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .bj-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .bj-thumb { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #333; }
+    .bj-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+    .bj-nick {
+      font-size: 12px; font-weight: 600; color: var(--label-secondary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .viewer-chip {
+      display: flex; align-items: center; gap: 5px;
+      height: 20px; padding: 0 8px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .viewer-chip img { width: 6px; height: 6px; display: block; }
+    .viewer-chip span { font-size: 12px; font-weight: 600; color: var(--label-secondary); white-space: nowrap; }
+
+    .bj-right-buttons { display: flex; gap: 6px; flex-shrink: 0; }
+    .round-btn {
+      width: 48px; height: 34px;
+      border-radius: 17px;
+      background: var(--ctn-bg-light-mid-alpha10);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .round-btn img { max-width: 20px; max-height: 20px; width: auto; height: auto; display: block; }
+    .round-btn.active { background: rgba(255,102,0,0.25); }
+
+    /* 하단 버튼 줄 */
+    .bottom-buttons {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 6px;
+      height: 50px;
+    }
+    .bottom-left, .bottom-right { display: flex; gap: 5px; align-items: center; }
+
+    /* 시크바 — 다른 플레이어 컨트롤과 동일하게 3초 후 자동 숨김 대상 */
+    .seek-bar-section {
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      padding: 6px 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: opacity 0.25s ease;
+    }
+    .live-app.controls-hidden .seek-bar-section {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .seek-time-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .seek-time {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 0 4px rgba(0,0,0,0.3);
+    }
+    .seek-live-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      height: 20px;
+      padding: 0 8px;
+      border-radius: 10px;
+      background: rgba(23,25,28,0.2);
+      border: 1px solid rgba(246,246,249,0.3);
+    }
+    .seek-live-dot { width: 6px; height: 6px; display: block; }
+    .seek-live-badge span {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(252,252,253,0.8);
+    }
+    .seek-slider {
+      position: relative;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      touch-action: none;
+    }
+    .seek-track {
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      height: 2px;
+      transform: translateY(-50%);
+      background: rgba(145,150,161,0.5);
+      border-radius: 1px;
+    }
+    .seek-fill {
+      position: absolute;
+      left: 0; top: 50%;
+      width: 20%;
+      height: 2px;
+      transform: translateY(-50%);
+      background: #44a3ff;
+      border-radius: 1px;
+    }
+    .seek-handle {
+      position: absolute;
+      top: 50%; left: 20%;
+      width: 24px; height: 24px;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .seek-handle img { width: 10px; height: 10px; display: block; }
+
+    /* ══════════════ ② 채팅 영역 ══════════════ */
+    /* 자체 배경 없음 — 뒤로 이어지는 비디오 + 하단 딤으로만 가독성 확보 */
+    .chat-section {
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      background: transparent;
+      height: 163px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      padding: 24px 0 0;
+      transition: height 0.2s ease;
+    }
+    .chat-drag-handle {
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 24px;
+      padding-top: 10px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      cursor: grab;
+      touch-action: none;
+      z-index: 6;
+    }
+    .chat-drag-handle::before {
+      content: '';
+      width: 40px; height: 4px;
+      border-radius: 2.5px;
+      background: var(--grey-light-alpha30);
+    }
+    .chat-drag-handle:active { cursor: grabbing; }
+
+    .chat-notice-pill {
+      position: absolute;
+      right: 10px; top: 8px;
+      z-index: 5;
+      background: rgba(35,37,41,0.3);
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      border-radius: 14px;
+      height: 28px;
+      max-width: 142px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 10px 0 6px;
+      cursor: pointer;
+    }
+    .chat-notice-pill .bell-wrap { position: relative; width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .chat-notice-pill .bell-wrap img.bell { width: 13px; height: 13px; display: block; }
+    .chat-notice-pill .bell-wrap img.dot { position: absolute; top: 1px; left: 1px; width: 6px; height: 6px; display: block; }
+    .chat-notice-pill span {
+      font-size: 12px; font-weight: 400; color: #d5d7dc;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .chat-list-wrap { width: 100%; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+    .chat-sys-msg {
+      text-align: center;
+      font-size: 14px; font-weight: 600;
+      color: var(--chat-800);
+      text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+      padding: 1px 0 9px;
+    }
+    .chat-list { display: flex; flex-direction: column; gap: 12px; padding: 0 10px; }
+    .chat-row { display: flex; align-items: flex-start; gap: 3px; }
+    .chat-row-badges { display: flex; align-items: center; gap: 4px; width: 127px; flex-shrink: 0; }
+    .chat-row-badges img.avatar { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .chat-badge { width: 14px; height: 14px; border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .chat-badge img { display: block; }
+    .chat-badge.b-bj { background: var(--chat-100); }
+    .chat-badge.b-manager { background: var(--chat-200); }
+    .chat-badge.b-bigfan { background: var(--chat-400); }
+    .chat-badge.b-fan { background: var(--chat-500); }
+    .chat-badge.b-supporter { background: var(--chat-900); }
+    .chat-badge.sub-badge { width: 18px; height: 18px; position: relative; }
+    .chat-badge.sub-badge img.base { width: 18px; height: 18px; }
+    .chat-badge.sub-badge img.inner { position: absolute; inset: 25% 12.5% 20% 20%; width: auto; height: auto; }
+    .chat-name {
+      font-size: 14px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+    }
+    .chat-text {
+      font-size: 14px; font-weight: 400; color: var(--chat-text);
+      text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      flex: 1; min-width: 0;
+    }
+    .chat-text a { color: var(--kr-primary); text-decoration: underline; }
+    .chat-row.notice .chat-name,
+    .chat-row.notice .chat-text { font-weight: 600; white-space: normal; }
+
+    /* 채팅 입력줄 */
+    .chat-input-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      flex-shrink: 0;
+    }
+    .icon-btn-34 { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .icon-btn-34 img { max-width: 24px; max-height: 24px; width: auto; height: auto; display: block; }
+    .chat-input-box {
+      flex: 1; min-width: 0;
+      height: 34px;
+      background: var(--grey-light-alpha20);
+      border-radius: 17px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding-left: 12px;
+    }
+    .chat-input-placeholder { font-size: 14px; color: var(--grey-light-alpha30); }
+
+    /* ══════════════ ③ 하단 광고 배너 ══════════════ */
+    .ad-banner-section {
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      background: var(--ctn-bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 50px;
+      padding: 0 10px 0 8px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      cursor: pointer;
+    }
+    .ad-left { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    .ad-thumb { width: 38px; height: 38px; border-radius: 19px; object-fit: cover; flex-shrink: 0; }
+    .ad-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .ad-sponsor { font-size: 10px; font-weight: 400; color: var(--label-tertiary-dark); white-space: nowrap; }
+    .ad-title { font-size: 14px; font-weight: 400; color: var(--label-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ad-more { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .ad-more span { font-size: 14px; font-weight: 400; color: var(--kr-primary); white-space: nowrap; }
+    .ad-more img { width: 10px; height: 6px; display: block; }
+    .ad-safe-area {
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      height: 32px;
+      background: var(--ctn-bg-dark);
+    }
+
+    /* 채팅/광고 숨김 (채팅 토글) */
+    .live-app.chat-hidden .chat-section { display: none; }
+
+    @media (max-width: 500px) {
+      body { padding: 0; background: #000; }
+      .phone-frame { width: 100vw; height: 100vh; background: none; }
+      .phone-frame::before { display: none; }
+      .phone-screen { inset: 0; border-radius: 0; }
+      .btn-side-left, .btn-side-right { display: none; }
+      .mockup-toggle { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="phone-frame" id="phoneFrame">
+  <div class="btn-side-left"></div>
+  <div class="btn-side-right"></div>
+  <div class="phone-screen">
+
+    <div class="live-app" id="liveApp">
+      <video class="bg-video" id="liveVideo" autoplay muted loop playsinline></video>
+      <div class="dim-top"></div>
+      <div class="dim-bottom"></div>
+
+      <!-- ① 비디오 영역 -->
+      <div class="video-section">
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <img class="status-levels" src="assets/live-icons/statusbar-levels-v2.svg" alt="" />
+        </div>
+
+        <div class="screen">
+          <div class="screen-overlay">
+            <!-- 상단 버튼 -->
+            <div class="top-buttons">
+              <div class="icon-btn-38" id="closeBtn" title="닫기">
+                <img src="assets/live-icons/icon-chevron-down.svg" alt="닫기" />
+              </div>
+              <div class="top-right-icons">
+                <div class="icon-btn-38" title="크롬캐스트"><img src="assets/live-icons/icon-chromecast.svg" alt="" /></div>
+                <div class="icon-btn-38" title="자막"><img src="assets/live-icons/icon-caption.svg" alt="" /></div>
+                <div class="icon-btn-38" title="공유"><img src="assets/live-icons/icon-share.svg" alt="" /></div>
+                <div class="icon-btn-38" title="클립 만들기"><img src="assets/live-icons/icon-userclip.svg" alt="" /></div>
+                <div class="icon-btn-38" id="moreBtn" title="더보기"><img src="assets/live-icons/icon-more.svg" alt="" /></div>
+              </div>
+            </div>
+
+            <!-- 방송 정보 -->
+            <div class="info-overlay-wrap">
+              <div class="live-info-overlay">
+                <p class="live-info-title" id="liveTitle">방송 제목이 여기에 표시됩니다.</p>
+                <div class="live-info-tags" id="liveTags"></div>
+                <div class="live-info-bjrow">
+                  <div class="bj-left">
+                    <img class="bj-thumb" id="streamerProfile" src="assets/profile_bj.jpg" alt="프로필" />
+                    <div class="bj-meta">
+                      <span class="bj-nick" id="streamerName">수달사랑</span>
+                      <div class="viewer-chip">
+                        <img src="assets/live-icons/viewer-oval.svg" alt="" />
+                        <span id="viewerCount">16,390</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bj-right-buttons">
+                    <div class="round-btn" id="subscribeBtn" title="구독">
+                      <img src="assets/live-icons/icon-subscribe.svg" alt="구독" />
+                    </div>
+                    <div class="round-btn" id="favoriteBtn" title="즐겨찾기">
+                      <img src="assets/live-icons/icon-favorite.svg" alt="즐겨찾기" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 하단 버튼 -->
+            <div class="bottom-buttons">
+              <div class="bottom-left">
+                <div class="icon-btn-38" title="애드벌룬"><img src="assets/live-icons/icon-adballoon.svg" alt="" /></div>
+                <div class="icon-btn-38" id="pollBtn" title="투표"><img src="assets/live-icons/icon-poll.svg" alt="" /></div>
+              </div>
+              <div class="bottom-right">
+                <div class="icon-btn-38" id="rotateBtn" title="화면 회전"><img src="assets/live-icons/icon-rotate.svg" alt="" /></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 시크바 (채팅 영역 위) -->
+        <div class="seek-bar-section" id="seekBarSection">
+          <div class="seek-time-row">
+            <span class="seek-time" id="seekTime">-00:10:01</span>
+            <div class="seek-live-badge">
+              <img class="seek-live-dot" src="assets/live-icons/icon-seek-live-dot.svg" alt="" />
+              <span>LIVE</span>
+            </div>
+          </div>
+          <div class="seek-slider" id="seekSlider">
+            <div class="seek-track"></div>
+            <div class="seek-fill" id="seekFill"></div>
+            <div class="seek-handle" id="seekHandle">
+              <img src="assets/live-icons/icon-seek-handle-dot.svg" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 채팅 영역 -->
+      <div class="chat-section" id="chatSection">
+        <div class="chat-drag-handle"></div>
+
+        <div class="chat-notice-pill" id="noticePill">
+          <div class="bell-wrap">
+            <img class="bell" src="assets/live-icons/icon-notice-bell.svg" alt="" />
+            <img class="dot" src="assets/live-icons/notice-oval-dot.svg" alt="" />
+          </div>
+          <span>오늘 저녁 2시 생방…</span>
+        </div>
+
+        <div class="chat-list-wrap">
+          <div class="chat-sys-msg">채팅을 시작합니다.</div>
+          <div class="chat-list" id="chatList"></div>
+        </div>
+
+        <div class="chat-input-row">
+          <div class="icon-btn-34" title="후원"><img src="assets/live-icons/icon-gift.svg" alt="" /></div>
+          <div class="chat-input-box">
+            <span class="chat-input-placeholder">채팅 입력</span>
+            <div class="icon-btn-34" title="이모티콘"><img src="assets/live-icons/icon-emoticon.svg" alt="" /></div>
+          </div>
+          <div class="icon-btn-34" title="전송"><img src="assets/live-icons/icon-send.svg" alt="" /></div>
+        </div>
+      </div>
+
+      <!-- ③ 하단 광고 배너 -->
+      <div class="ad-banner-section" id="adBanner">
+        <div class="ad-left">
+          <img class="ad-thumb" src="assets/live-icons/ad-banner-thumb.png" alt="" />
+          <div class="ad-text">
+            <span class="ad-sponsor">슈퍼도모 후원광고</span>
+            <span class="ad-title">놀러와 마이홈 열세자</span>
+          </div>
+        </div>
+        <div class="ad-more">
+          <span>자세히보기</span>
+          <img src="assets/live-icons/icon-chevron-up-small.svg" style="transform:scaleY(-1) rotate(-90deg);" alt="" />
+        </div>
+      </div>
+      <div class="ad-safe-area"></div>
+
+    </div><!-- /.live-app -->
+  </div><!-- /.phone-screen -->
+</div><!-- /.phone-frame -->
+
+<button class="mockup-toggle is-on" id="mockupToggle">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="12" cy="18" r="1.5" fill="currentColor"/>
+  </svg>
+  <span>목업 ON</span>
+</button>
+
+<script>
+  /* ── 방송 데이터 (home.html LIVE_ITEMS와 매칭) ── */
+  const STREAMS = [
+    { nick: '닉네임여섯0', title: '[생]BJ흔한의 롤드컵 선발전 킹존:SB 5전 3선승제 5경기', viewers: '16,390', profile: 'assets/profile_bj.jpg', video: 'assets/세로영상1.mp4', tags: ['한국어', '먹방', '먹방'] },
+    { nick: '수달사랑',   title: '수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다', viewers: '12,203', profile: 'assets/profile_bj.jpg', video: 'assets/세로영상3.mp4', tags: ['한국어', '동물'] },
+    { nick: '항상#킴성태', title: '네모도 꿈이있는데! 여우는빚쟁이가됌;; 랜드마꾸! 일이삼사오육칠팔', viewers: '8,832', profile: 'assets/profile_sub.jpg', video: 'assets/세로영상1.mp4', tags: ['보이는라디오', '먹방', '벚꽃엔딩'] },
+    { nick: 'SOOP공식',  title: '오늘 먹방 라이브! 최애 음식 리스트 공개합니다', viewers: '5,510', profile: 'assets/profile_bj.jpg', video: 'assets/세로영상2.mp4', tags: ['한국어', '먹방'] },
+    { nick: '게임킹',    title: '리그오브레전드 랭크게임 다이아도전 3일차', viewers: '4,102', profile: 'assets/profile_sub.jpg', video: 'assets/세로영상1.mp4', tags: ['게임', 'LOL'] },
+    { nick: '뷰티스타',  title: '오늘도 화이팅! 메이크업 튜토리얼 GRWM', viewers: '3,280', profile: 'assets/profile_bj.jpg', video: 'assets/세로영상2.mp4', tags: ['뷰티', '일상'] },
+  ];
+
+  const params = new URLSearchParams(location.search);
+  const idx = Math.min(Math.max(parseInt(params.get('i'), 10) || 0, 0), STREAMS.length - 1);
+  const stream = STREAMS[idx];
+
+  const liveVideo       = document.getElementById('liveVideo');
+  const streamerName    = document.getElementById('streamerName');
+  const streamerProfile = document.getElementById('streamerProfile');
+  const viewerCount     = document.getElementById('viewerCount');
+  const liveTitle       = document.getElementById('liveTitle');
+  const liveTags        = document.getElementById('liveTags');
+
+  function applyStream(s) {
+    streamerName.textContent = s.nick;
+    streamerProfile.src      = s.profile;
+    viewerCount.textContent  = s.viewers;
+    liveTitle.textContent    = s.title;
+    liveTags.innerHTML = s.tags.map((t, i) =>
+      `<span class="tag-chip ${i === 0 ? 'strong' : 'weak'}">${t}</span>`
+    ).join('');
+    liveVideo.src = s.video;
+    liveVideo.load();
+    liveVideo.play().catch(() => {});
+  }
+
+  applyStream(stream);
+
+  /* ── 닫기 ── */
+  document.getElementById('closeBtn').addEventListener('click', () => {
+    window.location.href = 'home.html';
+  });
+
+  /* ── 구독 / 즐겨찾기 토글 ── */
+  document.getElementById('subscribeBtn').addEventListener('click', function () {
+    this.classList.toggle('active');
+  });
+  document.getElementById('favoriteBtn').addEventListener('click', function () {
+    this.classList.toggle('active');
+  });
+
+  const liveApp = document.getElementById('liveApp');
+
+  /* ── 채팅 영역 드래그 리사이즈 ── */
+  /* 현재 높이(163px)가 최소 사이즈 기준. 핸들을 위로 당기면 확장, 아래로 당겨 최소 사이즈보다
+     더 줄이면 채팅 영역이 숨겨진다. 화면을 탭하면 다시 최소 사이즈로 복귀. */
+  const chatSection    = document.getElementById('chatSection');
+  const chatDragHandle = document.querySelector('.chat-drag-handle');
+  const CHAT_MIN_H = chatSection.getBoundingClientRect().height || 163;
+
+  const CHAT_MAX_ROWS = 6;
+
+  /* 채팅 6줄이 다 보이는 데 필요한 높이 — 실제 렌더된 행 높이/간격을 그대로 측정해서 계산 */
+  function getSixLineChatHeight() {
+    const listEl = document.getElementById('chatList');
+    const rows = listEl.querySelectorAll('.chat-row');
+    const rowH = rows.length ? rows[0].getBoundingClientRect().height : 20;
+    const gapPx = parseFloat(getComputedStyle(listEl).rowGap) || 12;
+    const listContentH = rowH * CHAT_MAX_ROWS + gapPx * (CHAT_MAX_ROWS - 1);
+    const sectionPadding = 24 + 20; /* chat-section padding: 24px top, 20px bottom */
+    const inputRowEl = document.querySelector('.chat-input-row');
+    const inputH = inputRowEl ? inputRowEl.getBoundingClientRect().height : 52;
+    return listContentH + sectionPadding + inputH;
+  }
+
+  function getChatMaxHeight() {
+    const appH      = liveApp.getBoundingClientRect().height;
+    const statusBarH = document.querySelector('.status-bar').getBoundingClientRect().height;
+    const adBannerH  = document.getElementById('adBanner').getBoundingClientRect().height;
+    const adSafeH    = document.querySelector('.ad-safe-area').getBoundingClientRect().height;
+    const minVideoVisible = 120; /* 비디오 최소 노출 영역 확보 */
+    const spaceBasedMax = appH - statusBarH - adBannerH - adSafeH - minVideoVisible;
+    return Math.max(CHAT_MIN_H, Math.min(getSixLineChatHeight(), spaceBasedMax));
+  }
+
+  /* 채팅 영역이 최소 사이즈보다 커진 만큼 하단 딤도 같이 커진다.
+     아래쪽 끝은 항상 화면 맨 아래에 고정되어야 하므로 이동(translate)이 아니라
+     bottom 기준 세로 스케일(scaleY)로 위쪽만 늘어나게 처리한다. */
+  const dimBottomEl = document.querySelector('.dim-bottom');
+  const DIM_BOTTOM_NATURAL_H = dimBottomEl.getBoundingClientRect().height;
+
+  function setChatHeight(h) {
+    chatSection.style.height = h + 'px';
+    const risen = Math.max(0, h - CHAT_MIN_H);
+    dimBottomEl.style.transition = chatSection.style.transition;
+    dimBottomEl.style.transform = risen ? `scaleY(${1 + risen / DIM_BOTTOM_NATURAL_H})` : '';
+  }
+
+  function restoreChatMin() {
+    liveApp.classList.remove('chat-hidden');
+    chatSection.style.transition = '';
+    setChatHeight(CHAT_MIN_H);
+  }
+
+  let chatDragging = false;
+  let chatDragStartY = 0;
+  let chatStartHeight = CHAT_MIN_H;
+  let chatMaxH = CHAT_MIN_H;
+
+  function chatDragStart(clientY) {
+    chatDragging = true;
+    liveApp.classList.remove('chat-hidden');
+    chatDragStartY = clientY;
+    chatStartHeight = chatSection.getBoundingClientRect().height;
+    chatMaxH = getChatMaxHeight();
+    chatSection.style.transition = 'none';
+  }
+
+  function chatDragMove(clientY) {
+    if (!chatDragging) return;
+    const dy = chatDragStartY - clientY; /* 위로 당기면 양수 */
+    let newH = chatStartHeight + dy;
+    newH = Math.max(0, Math.min(newH, chatMaxH));
+    setChatHeight(newH);
+  }
+
+  function chatDragEnd() {
+    if (!chatDragging) return;
+    chatDragging = false;
+    const currentH = chatSection.getBoundingClientRect().height;
+    if (currentH < CHAT_MIN_H) {
+      /* 0으로 부드럽게 줄인 뒤 display:none 처리 — 순간적으로 사라지면 비디오 버튼들이
+         잔상으로 남는 문제가 있어서, 높이 트랜지션이 끝난 뒤에 숨긴다 */
+      chatSection.style.transition = 'height 0.2s ease';
+      setChatHeight(0);
+      setTimeout(() => {
+        liveApp.classList.add('chat-hidden');
+        chatSection.style.transition = '';
+        setChatHeight(CHAT_MIN_H);
+      }, 200);
+    } else {
+      chatSection.style.transition = '';
+      setChatHeight(Math.min(currentH, chatMaxH));
+    }
+  }
+
+  chatDragHandle.addEventListener('touchstart', e => {
+    chatDragStart(e.touches[0].clientY);
+  }, { passive: true });
+  chatDragHandle.addEventListener('touchmove', e => {
+    if (!chatDragging) return;
+    e.preventDefault();
+    chatDragMove(e.touches[0].clientY);
+  }, { passive: false });
+  chatDragHandle.addEventListener('touchend', chatDragEnd);
+  chatDragHandle.addEventListener('touchcancel', chatDragEnd);
+
+  /* 데스크탑 목업 확인용 마우스 드래그 */
+  chatDragHandle.addEventListener('mousedown', e => {
+    e.preventDefault();
+    chatDragStart(e.clientY);
+  });
+  window.addEventListener('mousemove', e => {
+    if (chatDragging) chatDragMove(e.clientY);
+  });
+  window.addEventListener('mouseup', chatDragEnd);
+
+  /* ── 3초 후 컨트롤 자동 숨김 (채팅 영역 제외), 화면 탭하면 다시 표시 ── */
+  const screenEl = document.querySelector('.screen');
+  const chatSysMsg = document.querySelector('.chat-sys-msg');
+  let hideTimer = null;
+
+  function scheduleHide() {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      liveApp.classList.add('controls-hidden');
+      /* "채팅을 시작합니다"는 처음 한 번만 보여주고 첫 자동 숨김 때 함께 사라짐 */
+      chatSysMsg.style.display = 'none';
+    }, 3000);
+  }
+
+  function showControls() {
+    liveApp.classList.remove('controls-hidden');
+    restoreChatMin();
+    scheduleHide();
+  }
+
+  screenEl.addEventListener('click', showControls);
+  showControls();
+
+  /* ── 채팅 유저명 풀 / 메시지 풀 (닉네임과 채팅글을 서로 랜덤 조합) ── */
+  const CHAT_NAMES = [
+    { type: 'bj',        name: '닉네임여섯자', profile: 'assets/profile_bj.jpg' },
+    { type: 'manager',   name: '매니저닉네임' },
+    { type: 'bigfan',    name: '열혈팬닉넴',   profile: 'assets/profile_sub.jpg' },
+    { type: 'fan',       name: '팬클럽닉네임' },
+    { type: 'supporter', name: '서포터닉넴' },
+    { type: 'sub',       name: '구독노이모' },
+    { type: 'default',   name: 'A-염보성!!' },
+    { type: 'default',   name: 'WWWWWWWWWWWW' },
+    { type: 'default',   name: '시청자한명' },
+    { type: 'default',   name: '뉴비시청자' },
+    { type: 'default',   name: '단골팬닉네임' },
+  ];
+
+  const CHAT_TEXTS = [
+    '안녕하세요 ㅋㅋㅋ',
+    '연하게 해도 너무예쁜뎅 ㅋㅋㅋ',
+    '묻묻묻!',
+    '노노노노노',
+    '와 진짜 신기하다',
+    '처음 왔는데 너무 재밌다ㅋㅋ',
+    '오늘도 화이팅!! 🔥',
+    '대박이다 진짜 ㅋㅋㅋㅋㅋ',
+    '한번도 후회한적 없는데 <a href="#" onclick="return false;">www.afreecatv.com</a>',
+  ];
+
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function badgeHtml(item) {
+    switch (item.type) {
+      case 'bj':
+        return `<img class="avatar" src="${item.profile}" alt="" />
+                <div class="chat-badge b-bj"><img src="assets/live-icons/chat-badge-bj-frame.svg" style="width:6.6px;height:10px;" alt="" /></div>`;
+      case 'manager':
+        return `<div class="chat-badge b-manager"><img src="assets/live-icons/chat-badge-manager-m.svg" style="width:7.7px;height:7.1px;" alt="" /></div>`;
+      case 'bigfan':
+        return `<img class="avatar" src="${item.profile}" alt="" />
+                <div class="chat-badge b-bigfan"><img src="assets/live-icons/chat-badge-bigfan-frame.svg" style="width:8px;height:9.85px;" alt="" /></div>`;
+      case 'fan':
+        return `<div class="chat-badge b-fan"><img src="assets/live-icons/chat-badge-fan-f.svg" style="width:5px;height:7.1px;" alt="" /></div>`;
+      case 'supporter':
+        return `<div class="chat-badge b-supporter"><img src="assets/live-icons/chat-badge-supporter-s.svg" style="width:6px;height:7.5px;" alt="" /></div>`;
+      case 'sub':
+        return `<div class="chat-badge sub-badge">
+                  <img class="base" src="assets/live-icons/chat-badge-sub-tier1.svg" alt="" />
+                  <img class="inner" src="assets/live-icons/chat-badge-sub-tier1-frame.svg" alt="" />
+                </div>`;
+      case 'admin':
+        return `<img class="avatar" src="assets/live-icons/chat-badge-admin.png" alt="" style="border-radius:0;" />`;
+      case 'police':
+        return `<img class="avatar" src="assets/live-icons/chat-badge-police.png" alt="" style="border-radius:0;" />`;
+      default:
+        return '';
+    }
+  }
+
+  function nameColor(type) {
+    return {
+      bj: 'var(--chat-100)', manager: 'var(--chat-200)', bigfan: 'var(--chat-400)',
+      fan: 'var(--chat-500)', supporter: 'var(--chat-900)', sub: 'var(--chat-300)',
+      admin: 'var(--chat-600)', police: 'var(--chat-700)',
+    }[type] || 'var(--chat-default)';
+  }
+
+  const chatList = document.getElementById('chatList');
+
+  function addChatMsg() {
+    const nameItem = pickRandom(CHAT_NAMES);
+    const item = { type: nameItem.type, name: nameItem.name, profile: nameItem.profile, text: pickRandom(CHAT_TEXTS) };
+    const isNotice = item.type === 'admin' || item.type === 'police';
+    const row = document.createElement('div');
+    row.className = 'chat-row' + (isNotice ? ' notice' : '');
+    row.innerHTML = `
+      <div class="chat-row-badges">
+        ${badgeHtml(item)}
+        <span class="chat-name" style="color:${nameColor(item.type)}">${item.name}</span>
+      </div>
+      <span class="chat-text" style="${isNotice ? `color:${nameColor(item.type)}` : ''}">${item.text}</span>
+    `;
+    chatList.appendChild(row);
+    const rows = chatList.querySelectorAll('.chat-row');
+    if (rows.length > CHAT_MAX_ROWS) rows[0].remove();
+  }
+
+  addChatMsg();
+  setTimeout(addChatMsg, 500);
+  setTimeout(addChatMsg, 1100);
+  setInterval(addChatMsg, 2000);
+
+  /* ── 공지 배너 클릭 시 살짝 숨김 처리 (닫기 흉내) ── */
+  document.getElementById('noticePill').addEventListener('click', function () {
+    this.style.display = 'none';
+  });
+
+  /* ── 목업 토글 ── */
+  const frame = document.getElementById('phoneFrame');
+  const toggleBtn = document.getElementById('mockupToggle');
+  const toggleSpan = toggleBtn.querySelector('span');
+  toggleBtn.addEventListener('click', () => {
+    const isOn = frame.classList.toggle('no-frame');
+    toggleBtn.classList.toggle('is-on', !isOn);
+    toggleSpan.textContent = isOn ? '목업 OFF' : '목업 ON';
+  });
+</script>
+</body>
+</html>

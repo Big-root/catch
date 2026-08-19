@@ -284,16 +284,6 @@
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .badge-19 {
-      position: absolute; top: 7px; right: 7px;
-      width: 18px; height: 18px;
-      background: rgba(239,86,95,0.9);
-      border-radius: 4px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9px; font-weight: 700; color: #fff;
-      line-height: 1;
-    }
-
     /* 정보 영역 */
     .live-info {
       flex: 1; min-width: 0;
@@ -341,6 +331,7 @@
     .live-tag {
       height: 20px; padding: 0 8px;
       border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-weight: 400; color: var(--label-tertiary);
       white-space: nowrap;
     }
@@ -423,7 +414,7 @@
       <div class="nav-left">
         <div class="nav-icon-btn">
           <div style="position:relative; width:24px; height:24px;">
-            <img src="https://www.figma.com/api/mcp/asset/ad98fd42-7507-4212-b164-61b99840da79" style="position:absolute; inset:8.33% 8.33%; width:83.34%; height:83.34%; display:block;"/>
+            <img src="assets/home-icons/icon-header-upload.svg" style="position:absolute; inset:8.33% 8.33%; width:83.34%; height:83.34%; display:block;"/>
           </div>
         </div>
       </div>
@@ -453,13 +444,13 @@
       <div class="nav-right">
         <div class="nav-icon-btn" style="position:relative;">
           <div style="position:relative; width:24px; height:24px;">
-            <img src="https://www.figma.com/api/mcp/asset/cadd419a-5e03-4849-95f8-4abfccc8a61e" style="position:absolute; inset:8.33% 12.5%; width:75%; height:79.17%; display:block;"/>
-            <img src="https://www.figma.com/api/mcp/asset/49e69b73-887b-416c-99b8-ab11499c8f0d" style="position:absolute; top:16.67%; left:62.5%; width:37.5%; height:37.5%; display:block;"/>
+            <img src="assets/home-icons/icon-header-notification.svg" style="position:absolute; inset:8.33% 12.5%; width:75%; height:79.17%; display:block;"/>
+            <img src="assets/home-icons/icon-header-notification-dot.svg" style="position:absolute; top:16.67%; left:62.5%; width:37.5%; height:37.5%; display:block;"/>
           </div>
         </div>
         <div class="nav-icon-btn">
           <div style="position:relative; width:24px; height:24px;">
-            <img src="https://www.figma.com/api/mcp/asset/8b52c019-7aa0-4060-bea1-98b841357ef5" style="position:absolute; inset:8.33% 8.34% 8.33% 8.33%; width:83.33%; height:83.34%; display:block;"/>
+            <img src="assets/home-icons/icon-header-search.svg" style="position:absolute; inset:8.33% 8.34% 8.33% 8.33%; width:83.33%; height:83.34%; display:block;"/>
           </div>
         </div>
       </div>
@@ -469,7 +460,7 @@
     <div class="capsule-tabs">
       <div class="cap-tab">
         <div style="position:relative; width:16px; height:16px; flex-shrink:0;">
-          <img src="https://www.figma.com/api/mcp/asset/1fa935c2-29cd-4cc5-bec7-f54bafcac715" style="position:absolute; top:1px; left:1px; width:14px; height:14px; display:block;"/>
+          <img src="assets/home-icons/icon-tab-exploration.svg" style="position:absolute; top:1px; left:1px; width:14px; height:14px; display:block;"/>
         </div>
         탐색
       </div>
@@ -592,22 +583,25 @@
 <script>
   /* ── 라이브 리스트 데이터 ── */
   const LIVE_ITEMS = [
-    { nick: '닉네임여섯0', title: '[생]BJ흔한의 롤드컵 선발전 킹존:SB 5전 3선승제 5경기', viewers: '16,390', tags: ['한국어', '먹방', '먹방'] },
-    { nick: '수달사랑',   title: '수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다', viewers: '12,203', tags: ['한국어', '동물'] },
-    { nick: '항상#킴성태', title: '네모도 꿈이있는데! 여우는빚쟁이가됌;; 랜드마꾸! 일이삼사오육칠팔', viewers: '8,832', tags: ['보이는라디오', '먹방', '벚꽃엔딩'] },
-    { nick: 'SOOP공식',  title: '오늘 먹방 라이브! 최애 음식 리스트 공개합니다', viewers: '5,510', tags: ['한국어', '먹방'] },
-    { nick: '게임킹',    title: '리그오브레전드 랭크게임 다이아도전 3일차', viewers: '4,102', tags: ['게임', 'LOL'] },
-    { nick: '뷰티스타',  title: '오늘도 화이팅! 메이크업 튜토리얼 GRWM', viewers: '3,280', tags: ['뷰티', '일상'] },
+    { nick: '닉네임여섯0', title: '[생]BJ흔한의 롤드컵 선발전 킹존:SB 5전 3선승제 5경기', viewers: '16,390', tags: ['한국어', '먹방', '먹방'], thumb: 'assets/thumbs/live-thumb-1.jpg' },
+    { nick: '수달사랑',   title: '수달은 새끼를 낳으면 이곳저곳 돌아다니며 자랑하는 습성이 있습니다', viewers: '12,203', tags: ['한국어', '동물'], thumb: 'assets/thumbs/live-thumb-2.jpg' },
+    { nick: '항상#킴성태', title: '네모도 꿈이있는데! 여우는빚쟁이가됌;; 랜드마꾸! 일이삼사오육칠팔', viewers: '8,832', tags: ['보이는라디오', '먹방', '벚꽃엔딩'], thumb: 'assets/thumbs/live-thumb-3.jpg' },
+    { nick: 'SOOP공식',  title: '오늘 먹방 라이브! 최애 음식 리스트 공개합니다', viewers: '5,510', tags: ['한국어', '먹방'], thumb: 'assets/thumbs/live-thumb-4.jpg' },
+    { nick: '게임킹',    title: '리그오브레전드 랭크게임 다이아도전 3일차', viewers: '4,102', tags: ['게임', 'LOL'], thumb: 'assets/thumbs/live-thumb-5.jpg' },
+    { nick: '뷰티스타',  title: '오늘도 화이팅! 메이크업 튜토리얼 GRWM', viewers: '3,280', tags: ['뷰티', '일상'], thumb: 'assets/thumbs/live-thumb-6.jpg' },
   ];
 
   const list = document.getElementById('liveList');
 
-  LIVE_ITEMS.forEach(item => {
+  LIVE_ITEMS.forEach((item, idx) => {
     const el = document.createElement('div');
     el.className = 'live-item';
+    el.addEventListener('click', () => {
+      window.location.href = `live.html?i=${idx}`;
+    });
     el.innerHTML = `
       <div class="thumb-wrap">
-        <img class="thumb-img" src="assets/content_live_view.jpg" alt="썸네일" onerror="this.src='assets/profile_bj.jpg'"/>
+        <img class="thumb-img" src="${item.thumb}" alt="썸네일" onerror="this.src='assets/profile_bj.jpg'"/>
         <div class="thumb-badge-left">
           <div class="badge-live">
             <div class="badge-live-dot"></div>
@@ -618,7 +612,6 @@
             <div class="badge-sub-plus-icon"></div>
           </div>
         </div>
-        <div class="badge-19">19</div>
       </div>
       <div class="live-info">
         <div class="live-nick-row">
@@ -639,6 +632,7 @@
         </div>
       </div>
     `;
+    el.querySelector('.live-more-btn').addEventListener('click', e => e.stopPropagation());
     list.appendChild(el);
   });
 
