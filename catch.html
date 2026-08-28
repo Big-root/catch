@@ -1100,18 +1100,7 @@
 
   function setVODOnly(isVOD) {
     document.querySelectorAll('.vod-only').forEach(el => {
-      if (isVOD) {
-        el.style.display = '';
-        el.style.opacity = '0';
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          el.style.transition = 'opacity 0.35s ease';
-          el.style.opacity = '1';
-        }));
-      } else {
-        el.style.transition = '';
-        el.style.opacity = '';
-        el.style.display = 'none';
-      }
+      el.style.display = isVOD ? '' : 'none';
     });
     document.querySelectorAll('.live-only').forEach(el => {
       el.style.display = isVOD ? 'none' : '';
